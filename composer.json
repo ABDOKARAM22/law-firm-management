@@ -1,0 +1,17 @@
+{
+    "name": "abdokaram/law-firm-management",
+    "description": "Law Firm Management System built with PHP MVC and MySQL",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "LawFirmManagement\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Abdelrahman Karam",
+            "email": "abdokaram678@gmail.com"
+        }
+    ],
+    "require": {}
+}
