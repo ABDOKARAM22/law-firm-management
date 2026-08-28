@@ -28,4 +28,12 @@ class AuthController
 
         echo 'Invalid email or password';
     }
+
+    public function logout(): void
+{
+    $this->auth->logout();
+
+    header('Location: ?route=login');
+    exit;
+}
 }
