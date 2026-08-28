@@ -33,6 +33,12 @@ class Router
 
 
             case 'logout':
+                if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                    http_response_code(405);
+                    echo 'Method Not Allowed';
+                    break;
+                }
+
                 $this->authController->logout();
                 break;
 

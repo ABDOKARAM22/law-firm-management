@@ -8,6 +8,28 @@
 
 <body>
 
+
+    <?php
+
+    use LawFirmManagement\Core\Flash;
+
+    $error = Flash::get('error');
+    $success = Flash::get('success');
+    ?>
+
+    <?php if ($error): ?>
+        <div>
+            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($success): ?>
+        <div>
+            <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+
+
     <main>
         <h1>نظام إدارة مكتب المحاماة</h1>
 

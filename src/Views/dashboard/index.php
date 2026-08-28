@@ -8,6 +8,20 @@
 
 <body>
 
+    <?php
+
+    use LawFirmManagement\Core\Flash;
+
+    $success = Flash::get('success');
+    ?>
+
+    <?php if ($success): ?>
+        <div>
+            <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
+        </div>
+    <?php endif; ?>
+
+
     <h1>لوحة التحكم</h1>
 
     <p>
@@ -20,7 +34,22 @@
         <?= htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') ?>
     </p>
 
-    <a href="?route=logout">تسجيل الخروج</a>
+
+    <form method="POST" action="?route=logout">
+    <input
+        type="hidden"
+        name="_token"
+        value="<?= htmlspecialchars(
+            \LawFirmManagement\Core\Csrf::token(),
+            ENT_QUOTES,
+            'UTF-8'
+        ) ?>"
+    >
+
+    <button type="submit">
+        تسجيل الخروج
+    </button>
+    </form>
 
 </body>
 </html>
