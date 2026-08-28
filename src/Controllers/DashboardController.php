@@ -3,20 +3,18 @@
 namespace LawFirmManagement\Controllers;
 
 use LawFirmManagement\Core\Auth;
+use LawFirmManagement\Core\Authorization;
 
 class DashboardController
 {
     public function __construct(
-        private Auth $auth
+        private Auth $auth,
+        private Authorization $authorization
     ) {
     }
 
     public function index(): void
     {
-        if (!$this->auth->check()) {
-            header('Location: ?route=login');
-            exit;
-        }
 
         $user = $this->auth->user();
 

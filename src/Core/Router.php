@@ -4,12 +4,18 @@ namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\DashboardController;
+use LawFirmManagement\Controllers\UsersController;
+use LawFirmManagement\Middleware\AuthMiddleware;
+use LawFirmManagement\Middleware\RoleMiddleware;
 
 class Router
 {
     public function __construct(
         private AuthController $authController,
-        private DashboardController $dashboardController
+        private DashboardController $dashboardController,
+        private UsersController $usersController,
+        private AuthMiddleware $authMiddleware,
+        private RoleMiddleware $roleMiddleware
     ) {
     }
 
@@ -26,8 +32,20 @@ class Router
                 }
 
                 break;
+            
 
+            case 'users':
+                $this->authMiddleware->handle();
+
+                $this->roleMiddleware->handle('admin');
+
+                $this->usersController->index();
+                break;
+
+                
             case 'dashboard':
+                $this->authMiddleware->handle();
+
                 $this->dashboardController->index();
                 break;
 

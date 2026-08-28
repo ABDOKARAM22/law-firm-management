@@ -3,7 +3,11 @@
 namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AuthController;
+use LawFirmManagement\Core\Authorization;
+use LawFirmManagement\Middleware\AuthMiddleware;
+use LawFirmManagement\Middleware\RoleMiddleware;
 use LawFirmManagement\Controllers\DashboardController;
+use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Repositories\UserRepository;
 
 class Application
@@ -24,12 +28,20 @@ class Application
         $auth = new Auth($userRepository);
 
         $authController = new AuthController($auth);
+        $authorization = new Authorization($auth);
 
-        $dashboardController = new DashboardController($auth);
+        $authMiddleware = new AuthMiddleware($auth);
+        $roleMiddleware = new RoleMiddleware($authorization);
+
+        $dashboardController = new DashboardController($auth, $authorization);
+        $usersController = new UsersController();
 
         $router = new Router(
             $authController,
-            $dashboardController
+            $dashboardController,
+             $usersController,
+            $authMiddleware,
+            $roleMiddleware
         );
 
         $route = $_GET['route'] ?? '';
