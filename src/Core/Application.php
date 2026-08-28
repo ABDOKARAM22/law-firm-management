@@ -2,8 +2,9 @@
 
 namespace LawFirmManagement\Core;
 
-use LawFirmManagement\Repositories\UserRepository;
 use LawFirmManagement\Controllers\AuthController;
+use LawFirmManagement\Controllers\DashboardController;
+use LawFirmManagement\Repositories\UserRepository;
 
 class Application
 {
@@ -22,9 +23,14 @@ class Application
 
         $auth = new Auth($userRepository);
 
-        $controller = new AuthController($auth);
+        $authController = new AuthController($auth);
 
-        $router = new Router($controller);
+        $dashboardController = new DashboardController($auth);
+
+        $router = new Router(
+            $authController,
+            $dashboardController
+        );
 
         $route = $_GET['route'] ?? '';
 
