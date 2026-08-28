@@ -3,6 +3,7 @@
 namespace LawFirmManagement\Controllers;
 
 use LawFirmManagement\Core\Auth;
+use LawFirmManagement\Core\Csrf;
 
 class AuthController
 {
@@ -18,6 +19,12 @@ class AuthController
 
     public function login(): void
     {
+
+        if (!Csrf::verify($_POST['_token'] ?? null)) {
+        http_response_code(419);
+        echo 'Invalid CSRF token';
+        return;
+}
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 

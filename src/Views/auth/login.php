@@ -12,8 +12,19 @@
         <h1>نظام إدارة مكتب المحاماة</h1>
 
         <h2>تسجيل الدخول</h2>
-
+        
         <form method="POST" action="?route=login">
+
+
+            <input
+                type="hidden"
+                name="_token"
+                value="<?= 
+                htmlspecialchars(
+                \LawFirmManagement\Core\Csrf::token(), ENT_QUOTES, 'UTF-8' )?>"
+            >
+
+            
             <div>
                 <label for="email">البريد الإلكتروني</label>
                 <input
@@ -33,6 +44,8 @@
                     required
                 >
             </div>
+
+
 
             <button type="submit">تسجيل الدخول</button>
         </form>
