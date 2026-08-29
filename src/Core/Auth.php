@@ -53,6 +53,16 @@ class Auth
         );
     }
 
+    public function id(): ?int
+    {
+        if (!$this->check()) {
+            return null;
+        }
+
+        return (int) Session::get('user_id');
+    }
+
+
     public function logout(): void
     {
         Session::destroy();

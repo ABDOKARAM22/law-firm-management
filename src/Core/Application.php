@@ -3,11 +3,10 @@
 namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AuthController;
-use LawFirmManagement\Core\Authorization;
-use LawFirmManagement\Middleware\AuthMiddleware;
-use LawFirmManagement\Middleware\RoleMiddleware;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
+use LawFirmManagement\Middleware\AuthMiddleware;
+use LawFirmManagement\Middleware\RoleMiddleware;
 use LawFirmManagement\Repositories\UserRepository;
 use LawFirmManagement\Services\UserService;
 
@@ -15,9 +14,11 @@ class Application
 {
     public function run(): void
     {
+        // Load environment variables
         $env = new Env();
         $env->load();
 
+        // Database
         $config = require __DIR__ . '/../../config/database.php';
 
         $database = new Database($config);
@@ -26,30 +27,44 @@ class Application
             $database->getConnection()
         );
 
-        $userService = new UserService(
-        $userRepository
-        );
-
+        // Authentication
         $auth = new Auth($userRepository);
 
-        $authController = new AuthController($auth);
+        // Services
+        $userService = new UserService(
+            $userRepository,
+            $auth
+        );
+
+        // Authorization
         $authorization = new Authorization($auth);
 
+        // Controllers
+        $authController = new AuthController($auth);
+
+        $dashboardController = new DashboardController(
+            $auth,
+            $authorization
+        );
+
+        $usersController = new UsersController(
+            $userService
+        );
+
+        // Middleware
         $authMiddleware = new AuthMiddleware($auth);
         $roleMiddleware = new RoleMiddleware($authorization);
 
-        $dashboardController = new DashboardController($auth, $authorization);
-        $usersController = new UsersController($userService);
-        
-
+        // Router
         $router = new Router(
             $authController,
             $dashboardController,
-             $usersController,
+            $usersController,
             $authMiddleware,
             $roleMiddleware
         );
 
+        // Dispatch route
         $route = $_GET['route'] ?? '';
 
         $router->dispatch($route);

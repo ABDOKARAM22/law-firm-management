@@ -2,15 +2,17 @@
 
 namespace LawFirmManagement\Services;
 
-use LawFirmManagement\Core\Validator;
-use LawFirmManagement\Core\ValidationException;
-use LawFirmManagement\Repositories\UserRepository;
 use InvalidArgumentException;
+use LawFirmManagement\Core\Auth;
+use LawFirmManagement\Core\ValidationException;
+use LawFirmManagement\Core\Validator;
+use LawFirmManagement\Repositories\UserRepository;
 
 class UserService
 {
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private Auth $auth
     ) {
     }
 
@@ -122,6 +124,12 @@ class UserService
             ]);
         }
 
+        if ($id === $this->auth->id() && $status === 'inactive') {
+            throw new ValidationException([
+                'status' => 'لا يمكنك تعطيل حسابك الحالي.'
+            ]);
+        }
+        
         $this->userRepository->update(
             $id,
             $name,
