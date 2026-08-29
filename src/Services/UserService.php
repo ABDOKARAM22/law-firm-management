@@ -31,6 +31,7 @@ class UserService
         $validator
             ->required('name', $name)
             ->string('name', $name)
+            ->alpha('name', $name)
             ->required('email', $email)
             ->email('email', $email)
             ->required('password', $password)
@@ -50,7 +51,7 @@ class UserService
                 $validator->errors()
             );
         }
-        
+
         if ($this->userRepository->findByEmail($email)) {
             throw new ValidationException([
                 'email' => 'هذا البريد الإلكتروني مستخدم بالفعل.'

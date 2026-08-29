@@ -24,6 +24,15 @@ class Validator
         return $this;
     }
 
+    public function alpha(string $field, mixed $value): self
+    {
+        if (!is_string($value) || !preg_match('/^[\p{L}\s]+$/u', $value)) {
+            $this->errors[$field] = "يجب أن يحتوي {$field} على أحرف فقط.";
+        }
+
+        return $this;
+    }
+    
     public function email(string $field, string $value): self
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {

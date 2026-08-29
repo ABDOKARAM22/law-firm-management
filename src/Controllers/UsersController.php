@@ -36,14 +36,28 @@ class UsersController
             return;
         }
 
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? '';
+        $status = $_POST['status'] ?? '';
+
+        if (is_string($name)) {
+            $name = trim($name);
+        }
+
+        if (is_string($email)) {
+            $email = trim($email);
+        }
+
         try {
-            $this->userService->create(
-                trim($_POST['name'] ?? ''),
-                trim($_POST['email'] ?? ''),
-                $_POST['password'] ?? '',
-                $_POST['role'] ?? '',
-                $_POST['status'] ?? ''
-            );
+        $this->userService->create(
+            $name,
+            $email,
+            $password,
+            $role,
+            $status
+        );
 
             Flash::set(
                 'success',
