@@ -20,6 +20,7 @@ $name = 'Lawyer Abdelrahman Karam';
 $email = 'Lawyer@lawfirm.test';
 $password = 'Lawyer@12345';
 $role = 'lawyer';
+$status = 'active';
 
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
@@ -28,7 +29,8 @@ try {
         $name,
         $email,
         $hashedPassword,
-        $role
+        $role,
+        $status
     );
 
     echo "Admin created successfully. ID: {$userId}";

@@ -36,9 +36,15 @@ class Validator
         return $this;
     }
     
-    public function email(string $field, string $value): self
-    {
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+    public function email(string $field, mixed $value): self {
+        if ($value === null || $value === '') {
+            return $this;
+        }
+
+        if (
+            !is_string($value) ||
+            !filter_var($value, FILTER_VALIDATE_EMAIL)
+        ) {
             $this->errors[$field] =
                 "يجب إدخال بريد إلكتروني صحيح.";
         }
@@ -71,6 +77,38 @@ class Validator
 
         return $this;
     }
+
+    public function numericLength(
+    string $field,
+    mixed $value,
+    int $length
+    ): self {
+        if (
+            !is_string($value) ||
+            !preg_match('/^\d{' . $length . '}$/', $value)
+        ) {
+            $this->errors[$field] =
+                "يجب أن يحتوي {$field} على {$length} رقمًا بالضبط.";
+        }
+
+        return $this;
+    }
+    
+    public function egyptianPhone(
+    string $field,
+    mixed $value
+    ): self {
+        if (
+            !is_string($value) ||
+            !preg_match('/^01[0125][0-9]{8}$/', $value)
+        ) {
+            $this->errors[$field] =
+                "يجب إدخال رقم هاتف محمول مصري صحيح.";
+        }
+
+        return $this;
+    }
+
 
     public function fails(): bool
     {

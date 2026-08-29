@@ -3,6 +3,7 @@
 namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AuthController;
+use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Middleware\AuthMiddleware;
@@ -14,6 +15,7 @@ class Router
         private AuthController $authController,
         private DashboardController $dashboardController,
         private UsersController $usersController,
+        private ClientController $clientController,
         private AuthMiddleware $authMiddleware,
         private RoleMiddleware $roleMiddleware
     ) {
@@ -67,13 +69,35 @@ class Router
                 $this->usersController->edit();
             }
             break;
-
+                
             case 'dashboard':
                 $this->authMiddleware->handle();
 
                 $this->dashboardController->index();
                 break;
 
+            case 'clients':
+
+                $this->authMiddleware->handle();
+
+                $clients = $this->clientController->index();
+
+            break;
+            
+            
+
+            case 'clients/create':
+
+                $this->authMiddleware->handle();
+                $this->roleMiddleware->handle('admin');
+
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->clientController->store();
+                } else {
+                    $this->clientController->create();
+                }
+
+            break;
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
