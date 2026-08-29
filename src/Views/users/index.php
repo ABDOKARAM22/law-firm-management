@@ -48,6 +48,7 @@
                 <th>الدور</th>
                 <th>الحالة</th>
                 <th>تاريخ الإنشاء</th>
+                <th>تعديل بيانات المستخدم</th>
             </tr>
         </thead>
 
@@ -99,6 +100,13 @@
                         'UTF-8'
                     ) ?>
                 </td>
+
+                <td>
+                    <a href="?route=users/edit&id=<?= (int) $user['id'] ?>">
+                        تعديل       
+                    </a>
+                </td>
+                
             </tr>
 
         <?php endforeach; ?>

@@ -26,6 +26,8 @@ class UserRepository
         return $statement->fetchAll();
     }
 
+    
+
     public function findByEmail(string $email): ?array
     {
         $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
@@ -54,6 +56,7 @@ class UserRepository
         return $user ?: null;
     }
 
+    
     public function create(
         string $name,
         string $email,
@@ -72,6 +75,52 @@ class UserRepository
             'name' => $name,
             'email' => $email,
             'password' => $password,
+            'role' => $role,
+            'status' => $status,
+        ]);
+    }
+
+
+    public function existsByEmailExceptId(
+        string $email,
+        int $userId
+    ): bool {
+        $statement = $this->db->prepare(
+            'SELECT 1
+            FROM users
+            WHERE email = :email
+            AND id != :id
+            LIMIT 1'
+        );
+
+        $statement->execute([
+            'email' => $email,
+            'id' => $userId,
+        ]);
+
+        return $statement->fetch() !== false;
+    }
+
+    public function update(
+        int $id,
+        string $name,
+        string $email,
+        string $role,
+        string $status
+    ): bool {
+        $statement = $this->db->prepare(
+            'UPDATE users
+            SET name = :name,
+                email = :email,
+                role = :role,
+                status = :status
+            WHERE id = :id'
+        );
+
+        return $statement->execute([
+            'id' => $id,
+            'name' => $name,
+            'email' => $email,
             'role' => $role,
             'status' => $status,
         ]);

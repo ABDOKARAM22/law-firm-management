@@ -57,6 +57,17 @@ class Router
                 break;
 
 
+            case 'users/edit':
+            $this->authMiddleware->handle();
+            $this->roleMiddleware->handle('admin');
+            
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->usersController->update();
+            } else {
+                $this->usersController->edit();
+            }
+            break;
+
             case 'dashboard':
                 $this->authMiddleware->handle();
 

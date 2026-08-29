@@ -26,8 +26,11 @@ class Validator
 
     public function alpha(string $field, mixed $value): self
     {
-        if (!is_string($value) || !preg_match('/^[\p{L}\s]+$/u', $value)) {
-            $this->errors[$field] = "يجب أن يحتوي {$field} على أحرف فقط.";
+        if (
+            !is_string($value) ||
+            !preg_match('/^[\p{Arabic}\p{Latin}\s]+$/u', $value)
+        ) {
+            $this->errors[$field] = "يجب أن يحتوي {$field} على أحرف عربية أو إنجليزية فقط.";
         }
 
         return $this;

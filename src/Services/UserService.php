@@ -19,6 +19,13 @@ class UserService
         return $this->userRepository->all();
     }
 
+
+    public function find(int $id): ?array
+    {
+        return $this->userRepository->findById($id);
+    }
+
+
     public function create(
         string $name,
         string $email,
@@ -67,6 +74,58 @@ class UserService
             $name,
             $email,
             $hashedPassword,
+            $role,
+            $status
+        );
+    }
+
+
+        public function update(
+        int $id,
+        string $name,
+        string $email,
+        string $role,
+        string $status
+    ): void {
+        $validator = new Validator();
+
+        $validator
+            ->required('name', $name)
+            ->string('name', $name)
+            ->alpha('name', $name)
+            ->required('email', $email)
+            ->email('email', $email)
+            ->in('role', $role, [
+                'admin',
+                'lawyer',
+                'staff',
+            ])
+            ->in('status', $status, [
+                'active',
+                'inactive',
+            ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException(
+                $validator->errors()
+            );
+        }
+
+        if (
+            $this->userRepository->existsByEmailExceptId(
+                $email,
+                $id
+            )
+        ) {
+            throw new ValidationException([
+                'email' => 'هذا البريد الإلكتروني مستخدم بالفعل.'
+            ]);
+        }
+
+        $this->userRepository->update(
+            $id,
+            $name,
+            $email,
             $role,
             $status
         );
