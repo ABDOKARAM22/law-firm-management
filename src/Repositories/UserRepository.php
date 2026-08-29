@@ -13,6 +13,19 @@ class UserRepository
         $this->db = $db;
     }
 
+    public function all(): array
+    {
+        $statement = $this->db->prepare(
+            'SELECT id, name, email, role, status, created_at, updated_at
+            FROM users
+            ORDER BY id DESC'
+        );
+
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
     public function findByEmail(string $email): ?array
     {
         $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
@@ -45,22 +58,23 @@ class UserRepository
         string $name,
         string $email,
         string $password,
-        string $role
-    ): int {
-        $sql = "
-            INSERT INTO users (name, email, password, role)
-            VALUES (:name, :email, :password, :role)
-        ";
+        string $role,
+        string $status
+    ): bool {
+        $statement = $this->db->prepare(
+            'INSERT INTO users
+            (name, email, password, role, status)
+            VALUES
+            (:name, :email, :password, :role, :status)'
+        );
 
-        $stmt = $this->db->prepare($sql);
-
-        $stmt->execute([
+        return $statement->execute([
             'name' => $name,
             'email' => $email,
             'password' => $password,
-            'role' => $role
+            'role' => $role,
+            'status' => $status,
         ]);
-
-        return (int) $this->db->lastInsertId();
     }
+
 }

@@ -42,7 +42,21 @@ class Router
                 $this->usersController->index();
                 break;
 
-                
+
+            case 'users/create':
+                $this->authMiddleware->handle();
+
+                $this->roleMiddleware->handle('admin');
+
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->usersController->store();
+                } else {
+                    $this->usersController->create();
+                }
+
+                break;
+
+
             case 'dashboard':
                 $this->authMiddleware->handle();
 

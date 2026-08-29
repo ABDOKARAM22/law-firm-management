@@ -9,6 +9,7 @@ use LawFirmManagement\Middleware\RoleMiddleware;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Repositories\UserRepository;
+use LawFirmManagement\Services\UserService;
 
 class Application
 {
@@ -25,6 +26,10 @@ class Application
             $database->getConnection()
         );
 
+        $userService = new UserService(
+        $userRepository
+        );
+
         $auth = new Auth($userRepository);
 
         $authController = new AuthController($auth);
@@ -34,7 +39,8 @@ class Application
         $roleMiddleware = new RoleMiddleware($authorization);
 
         $dashboardController = new DashboardController($auth, $authorization);
-        $usersController = new UsersController();
+        $usersController = new UsersController($userService);
+        
 
         $router = new Router(
             $authController,

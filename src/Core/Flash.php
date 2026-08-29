@@ -6,18 +6,18 @@ class Flash
 {
     private const SESSION_KEY = '_flash';
 
-    public static function set(string $key, string $message): void
+    public static function set(string $key, mixed $value): void
     {
         Session::start();
 
         $messages = Session::get(self::SESSION_KEY, []);
 
-        $messages[$key] = $message;
+        $messages[$key] = $value;
 
         Session::set(self::SESSION_KEY, $messages);
     }
 
-    public static function get(string $key): ?string
+    public static function get(string $key): mixed
     {
         Session::start();
 
