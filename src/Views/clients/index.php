@@ -1,10 +1,30 @@
+<?php
+use LawFirmManagement\Core\Session ;  
+use LawFirmManagement\Core\Flash;
+$success = Flash::get('success');
+?>
+
+
+
 <h1>Clients</h1>
+<?php if (Session::get('user_role') === 'admin'): ?>
 
-<a href="?route=clients/create">
-    إضافة عميل
-</a>
+    <a href="?route=clients/create">
+        إضافة عميل
+        </a>
 
-<table border="1">
+    <?php endif; ?>
+    
+    
+    
+    
+        <?php if ($success): ?>
+            <div>
+                <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+    
+    <table border="1">
     <thead>
         <tr>
             <th>ID</th>
@@ -13,6 +33,11 @@
             <th>الهاتف</th>
             <th>Email</th>
             <th>الحالة</th>
+            <?php if (Session::get('user_role') === 'admin'): ?>
+
+                <th>تعديل بيانات العميل</th>
+
+            <?php endif; ?>
         </tr>
     </thead>
 
@@ -64,6 +89,16 @@
                         ENT_QUOTES,
                         'UTF-8'
                     ) ?>
+                </td>
+
+                <td>
+                <?php if (Session::get('user_role') === 'admin'): ?>
+
+                    <a href="?route=clients/edit&id=<?= (int) $client['id'] ?>">
+                        تعديل
+                    </a>
+
+                <?php endif; ?>
                 </td>
 
             </tr>

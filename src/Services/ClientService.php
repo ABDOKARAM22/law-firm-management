@@ -95,4 +95,89 @@ class ClientService
             $status
         );
     }
+
+
+
+        public function update(
+        int $id,
+        mixed $name,
+        mixed $nationalId,
+        mixed $phone,
+        mixed $email,
+        mixed $address,
+        mixed $status
+    ): void {
+        $validator = new Validator();
+
+        $validator
+            ->required('name', $name)
+            ->string('name', $name)
+            ->alpha('name', $name)
+
+            ->required('national_id', $nationalId)
+            ->string('national_id', $nationalId)
+
+            ->required('phone', $phone)
+            ->string('phone', $phone)
+
+            ->string('email', $email)
+            ->email('email', $email)
+
+            ->string('address', $address)
+
+            ->required('status', $status)
+            ->in('status', $status, [
+                'active',
+                'inactive',
+            ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException(
+                $validator->errors()
+            );
+        }
+
+        $client = $this->clientRepository->findById($id);
+
+        if ($client === false) {
+            throw new ValidationException([
+                'client' => 'العميل غير موجود.'
+            ]);
+        }
+
+        if (
+            $this->clientRepository->existsByNationalIdExceptId(
+                $nationalId,
+                $id
+            )
+        ) {
+            throw new ValidationException([
+                'national_id' => 'الرقم القومي مستخدم بالفعل.'
+            ]);
+        }
+
+        if (
+            $email !== '' &&
+            $this->clientRepository->existsByEmailExceptId(
+                $email,
+                $id
+            )
+        ) {
+            throw new ValidationException([
+                'email' => 'البريد الإلكتروني مستخدم بالفعل.'
+            ]);
+        }
+
+        $this->clientRepository->update(
+            $id,
+            $name,
+            $nationalId,
+            $phone,
+            $email ?: null,
+            $address ?: null,
+            $status
+        );
+    }
+
+    
 }

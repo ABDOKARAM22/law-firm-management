@@ -1,3 +1,9 @@
+<?php
+use LawFirmManagement\Core\Session;
+use LawFirmManagement\Core\Flash;
+$success = Flash::get('success');
+
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,12 +14,6 @@
 </head>
 
 
-    <?php
-
-    use LawFirmManagement\Core\Flash;
-
-    $success = Flash::get('success');
-    ?>
 
     <?php if ($success): ?>
         <div>
@@ -27,9 +27,12 @@
 
     <h1>المستخدمون</h1>
 
+    <?php if (Session::get('user_role') === 'admin'): ?>
     <a href="?route=users/create">
     إضافة مستخدم
     </a>
+    <?php endif; ?>
+    
 
     <br>
 
@@ -48,7 +51,11 @@
                 <th>الدور</th>
                 <th>الحالة</th>
                 <th>تاريخ الإنشاء</th>
-                <th>تعديل بيانات المستخدم</th>
+                <?php if (Session::get('user_role') === 'admin'): ?>
+
+                    <th>تعديل بيانات المستخدم</th>
+
+                <?php endif; ?>
             </tr>
         </thead>
 
@@ -102,9 +109,13 @@
                 </td>
 
                 <td>
+               <?php if (Session::get('user_role') === 'admin'): ?>
+
                     <a href="?route=users/edit&id=<?= (int) $user['id'] ?>">
-                        تعديل       
+                        تعديل
                     </a>
+
+                <?php endif; ?>
                 </td>
                 
             </tr>

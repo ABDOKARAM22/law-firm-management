@@ -98,6 +98,19 @@ class Router
                 }
 
             break;
+                
+            case 'clients/edit':
+
+            $this->authMiddleware->handle();
+            $this->roleMiddleware->handle('admin');
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->clientController->update();
+            } else {
+                $this->clientController->edit();
+            }
+
+            break;
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
