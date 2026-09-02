@@ -132,4 +132,43 @@ class AppointmentRepository
         return $statement->fetchAll();
     }
 
+
+    public function update(
+    int $id,
+    ?int $clientId,
+    int $assignedUserId,
+    string $appointmentDate,
+    string $appointmentTime,
+    string $title,
+    string $type,
+    string $status,
+    ?string $notes
+    ): void {
+        $statement = $this->pdo->prepare(
+            'UPDATE appointments
+            SET
+                client_id = :client_id,
+                assigned_user_id = :assigned_user_id,
+                appointment_date = :appointment_date,
+                appointment_time = :appointment_time,
+                title = :title,
+                type = :type,
+                status = :status,
+                notes = :notes
+            WHERE id = :id'
+        );
+
+        $statement->execute([
+            'id' => $id,
+            'client_id' => $clientId,
+            'assigned_user_id' => $assignedUserId,
+            'appointment_date' => $appointmentDate,
+            'appointment_time' => $appointmentTime,
+            'title' => $title,
+            'type' => $type,
+            'status' => $status,
+            'notes' => $notes,
+        ]);
+    }
+
 }

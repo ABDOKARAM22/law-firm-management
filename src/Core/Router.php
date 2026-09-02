@@ -228,24 +228,21 @@ class Router
             break;
 
 
-            case 'appointments/edit':
-                $this->authMiddleware->handle();
+        case 'appointments/edit':
+            $this->authMiddleware->handle();
 
-                $id = filter_input(
-                    INPUT_GET,
-                    'id',
-                    FILTER_VALIDATE_INT
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->appointmentController->update(
+                    (int) ($_GET['id'] ?? 0)
                 );
-
-                if ($id === false || $id === null) {
-                    http_response_code(404);
-                    echo 'الموعد غير موجود.';
-                    break;
-                }
-
-                $this->appointmentController->edit($id);
+            } else {
+                $this->appointmentController->edit(
+                    (int) ($_GET['id'] ?? 0)
+                );
+            }
 
             break;
+                    
 
 
             case 'logout':

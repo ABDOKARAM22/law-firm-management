@@ -142,9 +142,18 @@ public function __construct(
         }
     }
 
-
     public function edit(int $id): void
     {
+
+
+        $appointment = $this->appointmentService->find($id);
+
+        if ($appointment === false) {
+            http_response_code(404);
+            echo 'الموعد غير موجود.';
+            return;
+        }
+
         if (!$this->appointmentAccessService->canAccess($id)) {
             http_response_code(403);
             echo 'ليس لديك صلاحية للوصول إلى هذا الموعد.';
@@ -160,10 +169,122 @@ public function __construct(
         }
 
         $clients = $this->clientService->all();
-
         $users = $this->userRepository->allActiveUsers();
 
+        $user = $this->auth->user();
+        $role = $user['role'];
+
         require __DIR__ . '/../Views/appointments/edit.php';
+    }
+
+    public function update(int $id): void
+    {
+        $appointment = $this->appointmentService->find($id);
+
+        if ($appointment === false) {
+            http_response_code(404);
+            echo 'الموعد غير موجود.';
+            return;
+        }
+
+        if (!$this->appointmentAccessService->canAccess($id)) {
+            http_response_code(403);
+            echo 'ليس لديك صلاحية لتعديل هذا الموعد.';
+            return;
+        }
+
+        if (!Csrf::verify($_POST['_token'] ?? null)) {
+            http_response_code(419);
+            echo 'Invalid CSRF token';
+            return;
+        }
+        $clientId = $_POST['client_id'] ?? null;
+        $assignedUserId = $_POST['assigned_user_id'] ?? '';
+        $appointmentDate = $_POST['appointment_date'] ?? '';
+        $appointmentTime = $_POST['appointment_time'] ?? '';
+        $title = $_POST['title'] ?? '';
+        $type = $_POST['type'] ?? '';
+        $status = $_POST['status'] ?? '';
+        $notes = $_POST['notes'] ?? '';
+
+        if ($clientId === '' || $clientId === null) {
+            $clientId = null;
+        } elseif (is_string($clientId)) {
+            $clientId = trim($clientId);
+        }
+
+        $values = [
+            &$assignedUserId,
+            &$appointmentDate,
+            &$appointmentTime,
+            &$title,
+            &$type,
+            &$status,
+            &$notes,
+        ];
+
+        foreach ($values as &$value) {
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+        }
+
+        $user = $this->auth->user();
+
+        $userId = (int) $user['id'];
+        $role = $user['role'];
+
+        /*
+        * Lawyer can only keep the appointment assigned to himself.
+        */
+        if ($role === 'lawyer') {
+            $assignedUserId = $userId;
+        }
+
+        try {
+            $this->appointmentService->update(
+                $id,
+                $clientId,
+                $assignedUserId,
+                $appointmentDate,
+                $appointmentTime,
+                $title,
+                $type,
+                $status,
+                $notes
+            );
+
+            Flash::set(
+                'success',
+                'تم تعديل الموعد بنجاح.'
+            );
+
+            header('Location: ?route=appointments');
+            exit;
+
+        } catch (ValidationException $exception) {
+
+            Flash::set(
+                'errors',
+                $exception->errors()
+            );
+
+            Flash::set('old', [
+                'client_id' => $clientId,
+                'assigned_user_id' => $assignedUserId,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => $appointmentTime,
+                'title' => $title,
+                'type' => $type,
+                'status' => $status,
+                'notes' => $notes,
+            ]);
+
+            header(
+                'Location: ?route=appointments/edit&id=' . $id
+            );
+            exit;
+        }
     }
 
 }
