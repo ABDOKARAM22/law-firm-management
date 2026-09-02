@@ -101,6 +101,12 @@ class Router
 
 
 
+        case 'cases/show':
+        $this->authMiddleware->handle();
+        $this->caseController->show((int) ($_GET['id'] ?? 0));
+        break;
+
+
             case 'dashboard':
                 $this->authMiddleware->handle();
 

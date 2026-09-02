@@ -39,4 +39,25 @@ class CaseStatusHistoryRepository
             'changed_by' => $changedBy,
         ]);
     }
+
+
+        public function allByCaseId(int $caseId): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT
+                case_status_history.*,
+                users.name AS changed_by_name
+            FROM case_status_history
+            INNER JOIN users
+                ON users.id = case_status_history.changed_by
+            WHERE case_status_history.case_id = :case_id
+            ORDER BY case_status_history.id DESC'
+        );
+
+        $statement->execute([
+            'case_id' => $caseId,
+        ]);
+
+        return $statement->fetchAll();
+    }
 }

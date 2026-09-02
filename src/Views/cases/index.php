@@ -188,10 +188,12 @@ $errors = Flash::get('errors');
 
                     <td>
                         <a
-                            href="?route=cases/edit&id=<?= (int) $case['id'] ?>"
-                            class="edit-btn"
-                        >
+                            href="?route=cases/edit&id=<?= (int) $case['id'] ?> "class="edit-btn">
                             تعديل
+                        </a>
+
+                        <a href="?route=cases/show&id=<?= (int) $case['id'] ?> "class="edit-btn" ">
+                            عرض
                         </a>
                     </td>
 

@@ -259,4 +259,19 @@ class CaseController
     }
 
     
+    public function show(int $id): void
+    {
+        $case = $this->caseService->find($id);
+
+        if ($case === false) {
+            http_response_code(404);
+            echo 'Case not found';
+            return;
+        }
+
+        $statusHistory = $this->caseService->statusHistory($id);
+
+        require __DIR__ . '/../Views/cases/show.php';
+    }
+
 }

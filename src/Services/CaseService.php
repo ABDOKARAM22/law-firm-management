@@ -320,4 +320,11 @@ class CaseService
                                 
     }
 
+
+        public function statusHistory(int $caseId): array
+    {
+        return $this->caseStatusHistoryRepository
+            ->allByCaseId($caseId);
+    }
+
 }
