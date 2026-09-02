@@ -2,6 +2,7 @@
 
 namespace LawFirmManagement\Core;
 
+use LawFirmManagement\Controllers\AppointmentController;
 use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
@@ -10,14 +11,14 @@ use LawFirmManagement\Controllers\CaseController;
 use LawFirmManagement\Controllers\HearingController;
 use LawFirmManagement\Middleware\AuthMiddleware;
 use LawFirmManagement\Middleware\RoleMiddleware;
-
+use LawFirmManagement\Repositories\AppointmentRepository;
 use LawFirmManagement\Repositories\UserRepository;
 use LawFirmManagement\Repositories\ClientRepository;
 use LawFirmManagement\Repositories\CaseRepository;
 use LawFirmManagement\Repositories\CaseTypeRepository;
 use LawFirmManagement\Repositories\CaseStatusHistoryRepository;
 use LawFirmManagement\Repositories\HearingRepository;
-
+use LawFirmManagement\Services\AppointmentService;
 use LawFirmManagement\Services\UserService;
 use LawFirmManagement\Services\ClientService;
 use LawFirmManagement\Services\CaseService;
@@ -49,10 +50,11 @@ class Application
 
         $caseTypeRepository = new CaseTypeRepository($pdo);
 
-        $caseStatusHistoryRepository =
-            new CaseStatusHistoryRepository($pdo);
+        $caseStatusHistoryRepository = new CaseStatusHistoryRepository($pdo);
 
         $hearingRepository = new HearingRepository($pdo);
+
+        $appointmentRepository = new AppointmentRepository($pdo); 
 
         // Authentication
         $auth = new Auth($userRepository);
@@ -79,6 +81,12 @@ class Application
         $hearingService = new HearingService(
             $hearingRepository,
             $caseRepository
+        );
+
+        $appointmentservice = new AppointmentService(
+            $appointmentRepository,
+            $clientRepository,
+            $userRepository
         );
 
         // Authorization
@@ -122,6 +130,14 @@ class Application
             $caseAccessService
             ); 
 
+
+            $appointmentController = new AppointmentController(
+                $appointmentservice,
+                $clientService,
+                $userRepository,
+                $auth
+            );
+
         // Middleware
         $authMiddleware = new AuthMiddleware($auth);
 
@@ -135,6 +151,7 @@ class Application
             $clientController,
             $caseController,
             $hearingController,
+            $appointmentController,
             $authMiddleware,
             $roleMiddleware
         );

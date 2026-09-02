@@ -2,6 +2,7 @@
 
 namespace LawFirmManagement\Core;
 
+use LawFirmManagement\Controllers\AppointmentController;
 use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\CaseController;
 use LawFirmManagement\Controllers\ClientController;
@@ -20,6 +21,7 @@ class Router
         private ClientController $clientController,
         private CaseController $caseController,
         private HearingController $hearingController,
+        private AppointmentController $appointmentController,
         private AuthMiddleware $authMiddleware,
         private RoleMiddleware $roleMiddleware
     ) {
@@ -204,7 +206,26 @@ class Router
             }
 
             break;
+
+
+
+            case 'appointments':
+            $this->authMiddleware->handle();
+            $this->appointmentController->index();
+
+            break;
+
             
+            case 'appointments/create':
+            $this->authMiddleware->handle();
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->appointmentController->store();
+            } else {
+                $this->appointmentController->create();
+            }
+
+            break;
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

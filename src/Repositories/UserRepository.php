@@ -27,6 +27,26 @@ class UserRepository
     }
 
     
+    public function allActiveUsers(): array
+    {
+        $statement = $this->db->prepare(
+            'SELECT
+                id,
+                name,
+                email,
+                role
+            FROM users
+            WHERE status = :status
+            AND role IN ("lawyer", "staff")
+            ORDER BY name ASC'
+        );
+
+        $statement->execute([
+            'status' => 'active',
+        ]);
+
+        return $statement->fetchAll();
+    }
 
     public function findByEmail(string $email): ?array
     {
