@@ -24,6 +24,24 @@ class Validator
         return $this;
     }
 
+
+    public function integer(string $field, mixed $value): self
+    {
+        if (
+            !is_int($value) &&
+            !(
+                is_string($value) &&
+                filter_var($value, FILTER_VALIDATE_INT) !== false
+            )
+        ) {
+            $this->errors[$field] =
+                "يجب أن يكون {$field} رقمًا صحيحًا.";
+        }
+
+        return $this;
+    }
+
+    
     public function alpha(string $field, mixed $value): self
     {
         if (

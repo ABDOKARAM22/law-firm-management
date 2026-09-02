@@ -3,6 +3,7 @@
 namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AuthController;
+use LawFirmManagement\Controllers\CaseController;
 use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
@@ -16,6 +17,7 @@ class Router
         private DashboardController $dashboardController,
         private UsersController $usersController,
         private ClientController $clientController,
+        private CaseController $caseController,
         private AuthMiddleware $authMiddleware,
         private RoleMiddleware $roleMiddleware
     ) {
@@ -69,7 +71,36 @@ class Router
                 $this->usersController->edit();
             }
             break;
-                
+
+
+
+        case 'cases/edit':
+
+            $this->authMiddleware->handle();
+            $this->roleMiddleware->handle('admin');
+
+            $id = filter_input(
+                INPUT_GET,
+                'id',
+                FILTER_VALIDATE_INT
+            );
+
+            if ($id === false || $id === null) {
+                http_response_code(400);
+                echo 'Invalid case ID';
+                break;
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->caseController->update($id);
+            } else {
+                $this->caseController->edit($id);
+            }
+
+        break;
+
+
+
             case 'dashboard':
                 $this->authMiddleware->handle();
 
@@ -111,6 +142,30 @@ class Router
             }
 
             break;
+
+
+            case 'cases':
+
+            $this->authMiddleware->handle();
+
+            $this->caseController->index();
+
+            break;
+
+
+            case 'cases/create':
+
+                $this->authMiddleware->handle();
+                $this->roleMiddleware->handle('admin');
+
+                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                    $this->caseController->store();
+                } else {
+                    $this->caseController->create();
+                }
+
+            break;
+
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

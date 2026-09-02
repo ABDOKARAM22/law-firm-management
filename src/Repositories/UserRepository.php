@@ -126,4 +126,46 @@ class UserRepository
         ]);
     }
 
+
+
+    public function findActiveLawyerById(
+    int $id
+    ): array|false {
+        $statement = $this->db->prepare(
+            'SELECT *
+            FROM users
+            WHERE id = :id
+            AND role = :role
+            AND status = :status
+            LIMIT 1'
+        );
+
+        $statement->execute([
+            'id' => $id,
+            'role' => 'lawyer',
+            'status' => 'active',
+        ]);
+
+        return $statement->fetch();
+    }
+
+
+    public function allActiveLawyers(): array
+    {
+        $statement = $this->db->prepare(
+            'SELECT id, name
+            FROM users
+            WHERE role = :role
+            AND status = :status
+            ORDER BY name ASC'
+        );
+
+        $statement->execute([
+            'role' => 'lawyer',
+            'status' => 'active',
+        ]);
+
+        return $statement->fetchAll();
+    }
+
 }

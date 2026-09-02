@@ -5,13 +5,21 @@ namespace LawFirmManagement\Core;
 use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
+use LawFirmManagement\Controllers\ClientController;
+use LawFirmManagement\Controllers\CaseController;
+
 use LawFirmManagement\Middleware\AuthMiddleware;
 use LawFirmManagement\Middleware\RoleMiddleware;
+
 use LawFirmManagement\Repositories\UserRepository;
-use LawFirmManagement\Services\UserService;
 use LawFirmManagement\Repositories\ClientRepository;
+use LawFirmManagement\Repositories\CaseRepository;
+use LawFirmManagement\Repositories\CaseTypeRepository;
+use LawFirmManagement\Repositories\CaseStatusHistoryRepository;
+
+use LawFirmManagement\Services\UserService;
 use LawFirmManagement\Services\ClientService;
-use LawFirmManagement\Controllers\ClientController;
+use LawFirmManagement\Services\CaseService;
 
 class Application
 {
@@ -26,13 +34,20 @@ class Application
 
         $database = new Database($config);
 
-        $userRepository = new UserRepository(
-            $database->getConnection()
-        );
+        // Get PDO connection
+        $pdo = $database->getConnection();
 
-        $clientRepository = new ClientRepository(
-            $database->getConnection()
-        );
+        // Repositories
+        $userRepository = new UserRepository($pdo);
+
+        $clientRepository = new ClientRepository($pdo);
+
+        $caseRepository = new CaseRepository($pdo);
+
+        $caseTypeRepository = new CaseTypeRepository($pdo);
+
+        $caseStatusHistoryRepository =
+            new CaseStatusHistoryRepository($pdo);
 
         // Authentication
         $auth = new Auth($userRepository);
@@ -44,9 +59,17 @@ class Application
         );
 
         $clientService = new ClientService(
-         $clientRepository
+            $clientRepository
         );
-        
+
+        $caseService = new CaseService(
+            $caseRepository,
+            $clientRepository,
+            $userRepository,
+            $caseTypeRepository,
+            $caseStatusHistoryRepository,
+            $pdo
+        );
 
         // Authorization
         $authorization = new Authorization($auth);
@@ -63,12 +86,21 @@ class Application
             $userService
         );
 
-         $clientController = new ClientController(
+        $clientController = new ClientController(
             $clientService
-        );  
+        );
+
+        $caseController = new CaseController(
+            $caseService,
+            $clientService,
+            $userRepository,
+            $caseTypeRepository,
+            $auth
+        );
 
         // Middleware
         $authMiddleware = new AuthMiddleware($auth);
+
         $roleMiddleware = new RoleMiddleware($authorization);
 
         // Router
@@ -77,6 +109,7 @@ class Application
             $dashboardController,
             $usersController,
             $clientController,
+            $caseController,
             $authMiddleware,
             $roleMiddleware
         );
