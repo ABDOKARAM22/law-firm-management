@@ -105,4 +105,31 @@ class AppointmentRepository
         return $appointment ?: false;
     }
 
+
+
+    public function allByAssignedUserId(int $userId): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT
+                appointments.*,
+                clients.name AS client_name,
+                users.name AS assigned_user_name
+            FROM appointments
+            LEFT JOIN clients
+                ON clients.id = appointments.client_id
+            INNER JOIN users
+                ON users.id = appointments.assigned_user_id
+            WHERE appointments.assigned_user_id = :user_id
+            ORDER BY
+                appointments.appointment_date DESC,
+                appointments.appointment_time DESC'
+        );
+
+        $statement->execute([
+            'user_id' => $userId,
+        ]);
+
+        return $statement->fetchAll();
+    }
+
 }

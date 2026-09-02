@@ -215,7 +215,7 @@ class Router
 
             break;
 
-            
+
             case 'appointments/create':
             $this->authMiddleware->handle();
 
@@ -226,6 +226,27 @@ class Router
             }
 
             break;
+
+
+            case 'appointments/edit':
+                $this->authMiddleware->handle();
+
+                $id = filter_input(
+                    INPUT_GET,
+                    'id',
+                    FILTER_VALIDATE_INT
+                );
+
+                if ($id === false || $id === null) {
+                    http_response_code(404);
+                    echo 'الموعد غير موجود.';
+                    break;
+                }
+
+                $this->appointmentController->edit($id);
+
+            break;
+
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

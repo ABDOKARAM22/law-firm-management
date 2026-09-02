@@ -18,6 +18,7 @@ use LawFirmManagement\Repositories\CaseRepository;
 use LawFirmManagement\Repositories\CaseTypeRepository;
 use LawFirmManagement\Repositories\CaseStatusHistoryRepository;
 use LawFirmManagement\Repositories\HearingRepository;
+use LawFirmManagement\Services\AppointmentAccessService;
 use LawFirmManagement\Services\AppointmentService;
 use LawFirmManagement\Services\UserService;
 use LawFirmManagement\Services\ClientService;
@@ -89,6 +90,11 @@ class Application
             $userRepository
         );
 
+        $appointmentAccessService = new AppointmentAccessService(
+            $appointmentRepository,
+            $auth
+        );
+
         // Authorization
         $authorization = new Authorization($auth);
 
@@ -135,6 +141,7 @@ class Application
                 $appointmentservice,
                 $clientService,
                 $userRepository,
+                $appointmentAccessService,
                 $auth
             );
 

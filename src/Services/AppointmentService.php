@@ -22,6 +22,13 @@ class AppointmentService
         return $this->appointmentRepository->all();
     }
 
+
+    public function find(int $id): array|false
+    {
+        return $this->appointmentRepository->findById($id);
+    }
+
+
     public function create(
         mixed $clientId,
         mixed $assignedUserId,

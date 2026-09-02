@@ -7,15 +7,18 @@ use LawFirmManagement\Core\Csrf;
 use LawFirmManagement\Core\Flash;
 use LawFirmManagement\Core\ValidationException;
 use LawFirmManagement\Repositories\UserRepository;
+use LawFirmManagement\Services\AppointmentAccessService;
 use LawFirmManagement\Services\AppointmentService;
 use LawFirmManagement\Services\ClientService;
 
 class AppointmentController
 {
+    
 public function __construct(
     private AppointmentService $appointmentService,
     private ClientService $clientService,
     private UserRepository $userRepository,
+    private AppointmentAccessService $appointmentAccessService,
     private Auth $auth
 ) {
 }
@@ -23,11 +26,11 @@ public function __construct(
 
     public function index(): void
     {
-        $appointments = $this->appointmentService->all();
+        $appointments = $this->appointmentAccessService->accessibleAppointments();
 
         require __DIR__ . '/../Views/appointments/index.php';
     }
-    
+
     public function create(): void
     {
         $clients = $this->clientService->all();
@@ -138,4 +141,29 @@ public function __construct(
             exit;
         }
     }
+
+
+    public function edit(int $id): void
+    {
+        if (!$this->appointmentAccessService->canAccess($id)) {
+            http_response_code(403);
+            echo 'ليس لديك صلاحية للوصول إلى هذا الموعد.';
+            return;
+        }
+
+        $appointment = $this->appointmentService->find($id);
+
+        if ($appointment === false) {
+            http_response_code(404);
+            echo 'الموعد غير موجود.';
+            return;
+        }
+
+        $clients = $this->clientService->all();
+
+        $users = $this->userRepository->allActiveUsers();
+
+        require __DIR__ . '/../Views/appointments/edit.php';
+    }
+
 }
