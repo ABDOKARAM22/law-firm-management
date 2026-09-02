@@ -2,14 +2,16 @@
 
 namespace LawFirmManagement\Controllers;
 
+use LawFirmManagement\Core\Auth;
 use LawFirmManagement\Core\Csrf;
 use LawFirmManagement\Core\Flash;
 use LawFirmManagement\Core\ValidationException;
-use LawFirmManagement\Services\CaseService;
 use LawFirmManagement\Repositories\CaseTypeRepository;
 use LawFirmManagement\Repositories\UserRepository;
+use LawFirmManagement\Services\CaseAccessService;
+use LawFirmManagement\Services\CaseService;
 use LawFirmManagement\Services\ClientService;
-use LawFirmManagement\Core\Auth;
+use LawFirmManagement\Services\HearingService;
 
 class CaseController
 {
@@ -18,13 +20,16 @@ class CaseController
         private ClientService $clientService,
         private UserRepository $userRepository,
         private CaseTypeRepository $caseTypeRepository,
-        private Auth $auth
+        private Auth $auth,
+        private HearingService $hearingService,
+        private CaseAccessService $caseAccessService
     ) {
     }
 
     public function index(): void
     {
-        $cases = $this->caseService->all();
+        
+        $cases = $this->caseAccessService->accessibleCases();
 
         require __DIR__ . '/../Views/cases/index.php';
     }
@@ -40,14 +45,19 @@ class CaseController
         require __DIR__ . '/../Views/cases/create.php';
     }
 
-
-        public function edit(int $id): void
+    public function edit(int $id): void
     {
         $case = $this->caseService->find($id);
 
         if ($case === false) {
             http_response_code(404);
             echo 'Case not found';
+            return;
+        }
+
+        if (!$this->caseAccessService->canAccess($id)) {
+            http_response_code(403);
+            echo 'Forbidden';
             return;
         }
 
@@ -59,7 +69,6 @@ class CaseController
 
         require __DIR__ . '/../Views/cases/edit.php';
     }
-
 
 
     public function store(): void
@@ -168,6 +177,13 @@ class CaseController
             return;
         }
 
+
+        if (!$this->caseAccessService->canAccess($id)) {
+        http_response_code(403);
+        echo 'Forbidden';
+        return;
+        }
+
         $caseNumber = $_POST['case_number'] ?? '';
         $title = $_POST['title'] ?? '';
         $clientId = $_POST['client_id'] ?? '';
@@ -269,9 +285,15 @@ class CaseController
             return;
         }
 
+        if (!$this->caseAccessService->canAccess($id)) {
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
+        }
+
         $statusHistory = $this->caseService->statusHistory($id);
+        $hearings = $this->hearingService->allByCaseId($id);
 
         require __DIR__ . '/../Views/cases/show.php';
     }
-
 }

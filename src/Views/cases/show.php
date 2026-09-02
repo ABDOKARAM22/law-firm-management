@@ -10,6 +10,13 @@ $statusLabels = [
     'cancelled' => 'ملغاة',
 ];
 
+$hearingStatusLabels = [
+    'scheduled' => 'مجدولة',
+    'completed' => 'مكتملة',
+    'postponed' => 'مؤجلة',
+    'cancelled' => 'ملغاة',
+];
+
 $oldStatusLabel = static function (?string $status) use ($statusLabels): string {
     if ($status === null || $status === '') {
         return '—';
@@ -21,15 +28,19 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
 ?>
 
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>تفاصيل القضية</title>
 
     <style>
+
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
@@ -85,7 +96,8 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
         }
 
         .case-info,
-        .history {
+        .history,
+        .hearings {
             width: 100%;
             border-collapse: collapse;
             background: white;
@@ -94,19 +106,22 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
         .case-info th,
         .case-info td,
         .history th,
-        .history td {
+        .history td,
+        .hearings th,
+        .hearings td {
             padding: 12px;
             border: 1px solid #ddd;
             text-align: right;
         }
 
-        .case-info th {
+        .case-info th,
+        .history th,
+        .hearings th {
             background: #eee;
-            width: 200px;
         }
 
-        .history th {
-            background: #eee;
+        .case-info th {
+            width: 200px;
         }
 
         .description {
@@ -133,7 +148,12 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
             font-weight: bold;
         }
 
+        .hearing-status {
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
+
             body {
                 margin: 20px;
             }
@@ -148,21 +168,28 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                 width: 120px;
             }
 
-            .history {
+            .history,
+            .hearings {
                 font-size: 14px;
             }
 
             .history th,
-            .history td {
+            .history td,
+            .hearings th,
+            .hearings td {
                 padding: 8px;
             }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="container">
+
 
     <!-- Header -->
 
@@ -182,11 +209,13 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
     <?php if ($message = Flash::get('success')): ?>
 
         <div class="success">
+
             <?= htmlspecialchars(
                 $message,
                 ENT_QUOTES,
                 'UTF-8'
             ) ?>
+
         </div>
 
     <?php endif; ?>
@@ -201,6 +230,7 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
         <table class="case-info">
 
             <tr>
+
                 <th>رقم القضية</th>
 
                 <td>
@@ -210,9 +240,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>عنوان القضية</th>
 
                 <td>
@@ -222,9 +254,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>العميل</th>
 
                 <td>
@@ -234,9 +268,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>المحامي</th>
 
                 <td>
@@ -246,9 +282,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>نوع القضية</th>
 
                 <td>
@@ -258,9 +296,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>المحكمة</th>
 
                 <td>
@@ -270,9 +310,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>رقم الدائرة</th>
 
                 <td>
@@ -282,9 +324,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>الحالة</th>
 
                 <td>
@@ -295,9 +339,11 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>تاريخ القيد</th>
 
                 <td>
@@ -307,12 +353,15 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                         'UTF-8'
                     ) ?>
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>الوصف</th>
 
                 <td class="description">
+
                     <?= nl2br(
                         htmlspecialchars(
                             $case['description'] ?? '—',
@@ -320,7 +369,9 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
                             'UTF-8'
                         )
                     ) ?>
+
                 </td>
+
             </tr>
 
         </table>
@@ -345,12 +396,14 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
             <table class="history">
 
                 <thead>
+
                     <tr>
                         <th>الحالة السابقة</th>
                         <th>الحالة الجديدة</th>
                         <th>بواسطة</th>
                         <th>التاريخ</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
@@ -408,6 +461,138 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
     </section>
 
 
+    <!-- Hearings -->
+
+    <section class="section">
+
+        <h2>جلسات القضية</h2>
+
+    <a href="?route=hearings/create&case_id=<?= (int) $case['id'] ?>" class="edit-btn">
+        إضافة جلسة
+    </a>
+
+        <?php if (empty($hearings)): ?>
+
+            <div class="empty">
+                لا توجد جلسات لهذه القضية.
+            </div>
+
+        <?php else: ?>
+
+            <table class="hearings">
+
+                <thead>
+
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الوقت</th>
+                        <th>المحكمة</th>
+                        <th>رقم الدائرة</th>
+                        <th>نوع الجلسة</th>
+                        <th>الحالة</th>
+                        <th>الملاحظات</th>
+                        <th>تعديل</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                <?php foreach ($hearings as $hearing): ?>
+
+                    <tr>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $hearing['hearing_date'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $hearing['hearing_time'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $hearing['court_name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $hearing['court_number'] ?? '—',
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $hearing['hearing_type'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td class="hearing-status">
+
+                            <?= htmlspecialchars(
+                                $hearingStatusLabels[
+                                    $hearing['status']
+                                ] ?? $hearing['status'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+
+                        </td>
+
+                        <td>
+
+                            <?php if (!empty($hearing['notes'])): ?>
+
+                                <?= nl2br(
+                                    htmlspecialchars(
+                                        $hearing['notes'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    )
+                                ) ?>
+
+                            <?php else: ?>
+
+                                —
+
+                            <?php endif; ?>
+
+                        </td>
+
+                        <td>
+                            <a href="?route=hearings/edit&id=<?= (int) $hearing['id'] ?>"  class="edit-btn" >
+                                تعديل           
+                            </a>
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
+
+        <?php endif; ?>
+
+    </section>
+
+
     <!-- Actions -->
 
     <section class="actions">
@@ -428,7 +613,9 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
 
     </section>
 
+
 </div>
 
 </body>
+
 </html>

@@ -32,6 +32,37 @@ class CaseRepository
         return $statement->fetchAll();
     }
 
+
+
+    public function allByLawyerId(int $lawyerId): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT
+                cases.*,
+                clients.name AS client_name,
+                users.name AS lawyer_name,
+                case_types.name AS case_type_name
+            FROM cases
+            INNER JOIN clients
+                ON clients.id = cases.client_id
+            INNER JOIN users
+                ON users.id = cases.assigned_lawyer_id
+            INNER JOIN case_types
+                ON case_types.id = cases.case_type_id
+            WHERE cases.assigned_lawyer_id = :lawyer_id
+            ORDER BY cases.id DESC'
+        );
+
+        $statement->execute([
+            'lawyer_id' => $lawyerId,
+        ]);
+
+        return $statement->fetchAll();
+    }
+
+
+
+
     public function findById(int $id): array|false
     {
         $statement = $this->pdo->prepare(

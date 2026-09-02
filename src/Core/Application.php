@@ -7,7 +7,7 @@ use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\CaseController;
-
+use LawFirmManagement\Controllers\HearingController;
 use LawFirmManagement\Middleware\AuthMiddleware;
 use LawFirmManagement\Middleware\RoleMiddleware;
 
@@ -16,10 +16,13 @@ use LawFirmManagement\Repositories\ClientRepository;
 use LawFirmManagement\Repositories\CaseRepository;
 use LawFirmManagement\Repositories\CaseTypeRepository;
 use LawFirmManagement\Repositories\CaseStatusHistoryRepository;
+use LawFirmManagement\Repositories\HearingRepository;
 
 use LawFirmManagement\Services\UserService;
 use LawFirmManagement\Services\ClientService;
 use LawFirmManagement\Services\CaseService;
+use LawFirmManagement\Services\HearingService;
+use LawFirmManagement\Services\CaseAccessService;
 
 class Application
 {
@@ -49,6 +52,8 @@ class Application
         $caseStatusHistoryRepository =
             new CaseStatusHistoryRepository($pdo);
 
+        $hearingRepository = new HearingRepository($pdo);
+
         // Authentication
         $auth = new Auth($userRepository);
 
@@ -71,8 +76,18 @@ class Application
             $pdo
         );
 
+        $hearingService = new HearingService(
+            $hearingRepository,
+            $caseRepository
+        );
+
         // Authorization
         $authorization = new Authorization($auth);
+
+        $caseAccessService = new CaseAccessService(
+            $caseRepository,
+            $auth
+        );
 
         // Controllers
         $authController = new AuthController($auth);
@@ -95,8 +110,17 @@ class Application
             $clientService,
             $userRepository,
             $caseTypeRepository,
-            $auth
-        );
+            $auth,
+            $hearingService,
+            $caseAccessService
+            );
+            
+            $hearingController = new HearingController(
+            $hearingService,
+            $caseService,
+            $auth,
+            $caseAccessService
+            ); 
 
         // Middleware
         $authMiddleware = new AuthMiddleware($auth);
@@ -110,6 +134,7 @@ class Application
             $usersController,
             $clientController,
             $caseController,
+            $hearingController,
             $authMiddleware,
             $roleMiddleware
         );

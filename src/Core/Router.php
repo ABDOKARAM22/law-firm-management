@@ -6,6 +6,7 @@ use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\CaseController;
 use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\DashboardController;
+use LawFirmManagement\Controllers\HearingController;
 use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Middleware\AuthMiddleware;
 use LawFirmManagement\Middleware\RoleMiddleware;
@@ -18,6 +19,7 @@ class Router
         private UsersController $usersController,
         private ClientController $clientController,
         private CaseController $caseController,
+        private HearingController $hearingController,
         private AuthMiddleware $authMiddleware,
         private RoleMiddleware $roleMiddleware
     ) {
@@ -77,7 +79,7 @@ class Router
         case 'cases/edit':
 
             $this->authMiddleware->handle();
-            $this->roleMiddleware->handle('admin');
+            $this->roleMiddleware->handle('admin', 'lawyer', 'staff');
 
             $id = filter_input(
                 INPUT_GET,
@@ -122,6 +124,21 @@ class Router
             break;
             
             
+
+            case 'hearings/create':
+            $this->authMiddleware->handle();
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->hearingController->store(
+                    (int) ($_GET['case_id'] ?? 0)
+                );
+            } else {
+                $this->hearingController->create(
+                    (int) ($_GET['case_id'] ?? 0)
+                );
+            }
+
+            break;
 
             case 'clients/create':
 
@@ -172,6 +189,22 @@ class Router
 
             break;
 
+
+            case 'hearings/edit':
+            $this->authMiddleware->handle();
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->hearingController->update(
+                    (int) ($_GET['id'] ?? 0)
+                );
+            } else {
+                $this->hearingController->edit(
+                    (int) ($_GET['id'] ?? 0)
+                );
+            }
+
+            break;
+            
 
             case 'logout':
                 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
