@@ -7,6 +7,7 @@ use LawFirmManagement\Controllers\AuthController;
 use LawFirmManagement\Controllers\CaseController;
 use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\DashboardController;
+use LawFirmManagement\Controllers\DocumentController;
 use LawFirmManagement\Controllers\HearingController;
 use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Middleware\AuthMiddleware;
@@ -22,6 +23,7 @@ class Router
         private CaseController $caseController,
         private HearingController $hearingController,
         private AppointmentController $appointmentController,
+        private DocumentController $documentController,
         private AuthMiddleware $authMiddleware,
         private RoleMiddleware $roleMiddleware
     ) {
@@ -29,6 +31,8 @@ class Router
 
     public function dispatch(string $route): void
     {
+          try {
+
         switch ($route) {
 
             case 'login':
@@ -245,20 +249,157 @@ class Router
                     
 
 
-            case 'logout':
-                if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-                    http_response_code(405);
-                    echo 'Method Not Allowed';
-                    break;
-                }
+            case 'cases/documents':
+            $this->authMiddleware->handle();
 
-                $this->authController->logout();
+            $caseId = filter_input(
+                INPUT_GET,
+                'id',
+                FILTER_VALIDATE_INT
+            );
+
+            if ($caseId === false || $caseId === null) {
+                http_response_code(404);
+                echo 'القضية غير موجودة.';
                 break;
+            }
+
+            $this->documentController->index($caseId);
+            
+            break;
+            
+            
+
+                
+        case 'documents/create':
+            $this->authMiddleware->handle();
+
+            $caseId = filter_input(
+                INPUT_GET,
+                'case_id',
+                FILTER_VALIDATE_INT
+            );
+
+            if ($caseId === false || $caseId === null) {
+                http_response_code(404);
+                echo 'رقم القضية غير صالح.';
+                break;
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $this->documentController->store($caseId);
+            } else {
+                $this->documentController->create($caseId);
+            }
+
+        break;
 
 
+
+        case 'documents/download':
+        $this->authMiddleware->handle();
+
+        $documentId = filter_input(
+            INPUT_GET,
+            'id',
+            FILTER_VALIDATE_INT
+        );
+
+        if ($documentId === false || $documentId === null) {
+            http_response_code(404);
+            echo 'المستند غير موجود.';
+            break;
+        }
+
+        $this->documentController->download($documentId);
+
+        break;
+
+
+
+        case 'documents/edit':
+            $this->authMiddleware->handle();
+
+            $documentId = filter_input(
+                INPUT_GET,
+                'id',
+                FILTER_VALIDATE_INT
+            );
+
+            if ($documentId === false || $documentId === null) {
+                http_response_code(404);
+                echo 'المستند غير موجود.';
+                break;
+            }
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+                $this->documentController->update($documentId);
+
+                break;
+            }
+
+            $this->documentController->edit($documentId);
+
+        break;
+
+
+
+
+        case 'documents/delete':
+            $this->authMiddleware->handle();
+
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo 'Method Not Allowed';
+                break;
+            }
+
+            $documentId = filter_input(
+                INPUT_GET,
+                'id',
+                FILTER_VALIDATE_INT
+            );
+
+            if ($documentId === false || $documentId === null) {
+                http_response_code(404);
+                echo 'المستند غير موجود.';
+                break;
+            }
+
+            $this->documentController->delete($documentId);
+
+        break;
+
+    
+        case 'logout':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                http_response_code(405);
+                echo 'Method Not Allowed';
+                break;
+            }
+
+            $this->authController->logout();
+            break;
+
+
+            
             default:
                 http_response_code(404);
                 echo '404 - Page Not Found';
+        }
+
+
+        } catch (ValidationException $exception) {
+        http_response_code(422);
+
+        $errors = $exception->errors();
+
+        echo '<h3>حدث خطأ:</h3>';
+
+        foreach ($errors as $error) {
+            echo '<p>' . htmlspecialchars($error) . '</p>';
+        }
         }
     }
 }

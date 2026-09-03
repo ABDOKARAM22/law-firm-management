@@ -598,10 +598,10 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
     <section class="actions">
 
         <a
-            href="?route=cases/edit&id=<?= (int) $case['id'] ?>"
+            href="?route=cases/documents&id=<?= (int) $case['id'] ?>"
             class="edit-btn"
         >
-            تعديل القضية
+            مستندات القضية
         </a>
 
         <a
