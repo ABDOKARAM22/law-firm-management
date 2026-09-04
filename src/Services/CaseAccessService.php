@@ -32,7 +32,6 @@ class CaseAccessService
             return true;
         }
 
-        
         // Lawyer can access only assigned cases
         if (
             $user['role'] === 'lawyer' &&
@@ -44,9 +43,7 @@ class CaseAccessService
         return false;
     }
 
-
-
-        public function accessibleCases(): array
+    public function accessibleCases(): array
     {
         $user = $this->auth->user();
 
@@ -65,5 +62,59 @@ class CaseAccessService
         }
 
         return [];
+    }
+
+    public function search(
+        string $search = '',
+        ?string $status = null,
+        ?int $caseTypeId = null,
+        ?int $lawyerId = null,
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+        $user = $this->auth->user();
+
+        if ($user === null) {
+            return [];
+        }
+
+        // Lawyer can only search within assigned cases
+        if ($user['role'] === 'lawyer') {
+            $lawyerId = (int) $user['id'];
+        }
+
+        return $this->caseRepository->search(
+            $search,
+            $status,
+            $caseTypeId,
+            $lawyerId,
+            $limit,
+            $offset
+        );
+    }
+
+    public function countSearchResults(
+        string $search = '',
+        ?string $status = null,
+        ?int $caseTypeId = null,
+        ?int $lawyerId = null
+    ): int {
+        $user = $this->auth->user();
+
+        if ($user === null) {
+            return 0;
+        }
+
+        // Lawyer can only count results from assigned cases
+        if ($user['role'] === 'lawyer') {
+            $lawyerId = (int) $user['id'];
+        }
+
+        return $this->caseRepository->countSearchResults(
+            $search,
+            $status,
+            $caseTypeId,
+            $lawyerId
+        );
     }
 }

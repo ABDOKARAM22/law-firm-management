@@ -28,12 +28,84 @@ class CaseController
 
     public function index(): void
     {
-        
-        $cases = $this->caseAccessService->accessibleCases();
+        $search = trim((string) ($_GET['search'] ?? ''));
+
+        $allowedStatuses = [
+            'pending',
+            'active',
+            'on_hold',
+            'closed',
+            'cancelled',
+        ];
+
+        $status = $_GET['status'] ?? null;
+
+        if (!in_array($status, $allowedStatuses, true)) {
+            $status = null;
+        }
+
+        $caseTypeId = filter_input(
+            INPUT_GET,
+            'case_type_id',
+            FILTER_VALIDATE_INT
+        );
+
+        if ($caseTypeId === false || $caseTypeId === null || $caseTypeId < 1) {
+            $caseTypeId = null;
+        }
+
+        $lawyerId = filter_input(
+            INPUT_GET,
+            'lawyer_id',
+            FILTER_VALIDATE_INT
+        );
+
+        if ($lawyerId === false || $lawyerId === null || $lawyerId < 1) {
+            $lawyerId = null;
+        }
+
+        $page = filter_input(
+            INPUT_GET,
+            'page',
+            FILTER_VALIDATE_INT
+        );
+
+        if ($page === false || $page === null || $page < 1) {
+            $page = 1;
+        }
+
+        $perPage = 10;
+
+        $offset = ($page - 1) * $perPage;
+
+        $cases = $this->caseAccessService->search(
+            $search,
+            $status,
+            $caseTypeId,
+            $lawyerId,
+            $perPage,
+            $offset
+        );
+
+        $total = $this->caseAccessService->countSearchResults(
+            $search,
+            $status,
+            $caseTypeId,
+            $lawyerId
+        );
+
+        $totalPages = max(
+            1,
+            (int) ceil($total / $perPage)
+        );
+
+        $lawyers = $this->userRepository->allActiveLawyers();
+
+        $caseTypes = $this->caseTypeRepository->all();
 
         require __DIR__ . '/../Views/cases/index.php';
     }
-
+    
     public function create(): void
     {
         $clients = $this->clientService->all();
