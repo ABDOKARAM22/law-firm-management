@@ -4,30 +4,32 @@ namespace LawFirmManagement\Core;
 
 use LawFirmManagement\Controllers\AppointmentController;
 use LawFirmManagement\Controllers\AuthController;
-use LawFirmManagement\Controllers\DashboardController;
-use LawFirmManagement\Controllers\UsersController;
-use LawFirmManagement\Controllers\ClientController;
 use LawFirmManagement\Controllers\CaseController;
+use LawFirmManagement\Controllers\ClientController;
+use LawFirmManagement\Controllers\DashboardController;
 use LawFirmManagement\Controllers\DocumentController;
 use LawFirmManagement\Controllers\HearingController;
+use LawFirmManagement\Controllers\UsersController;
 use LawFirmManagement\Middleware\AuthMiddleware;
 use LawFirmManagement\Middleware\RoleMiddleware;
 use LawFirmManagement\Repositories\AppointmentRepository;
-use LawFirmManagement\Repositories\UserRepository;
-use LawFirmManagement\Repositories\ClientRepository;
 use LawFirmManagement\Repositories\CaseRepository;
-use LawFirmManagement\Repositories\CaseTypeRepository;
 use LawFirmManagement\Repositories\CaseStatusHistoryRepository;
+use LawFirmManagement\Repositories\CaseTypeRepository;
+use LawFirmManagement\Repositories\ClientRepository;
+use LawFirmManagement\Repositories\DashboardRepository;
 use LawFirmManagement\Repositories\DocumentRepository;
 use LawFirmManagement\Repositories\HearingRepository;
+use LawFirmManagement\Repositories\UserRepository;
 use LawFirmManagement\Services\AppointmentAccessService;
 use LawFirmManagement\Services\AppointmentService;
-use LawFirmManagement\Services\UserService;
-use LawFirmManagement\Services\ClientService;
-use LawFirmManagement\Services\CaseService;
-use LawFirmManagement\Services\HearingService;
 use LawFirmManagement\Services\CaseAccessService;
+use LawFirmManagement\Services\CaseService;
+use LawFirmManagement\Services\ClientService;
+use LawFirmManagement\Services\DashboardService;
 use LawFirmManagement\Services\DocumentService;
+use LawFirmManagement\Services\HearingService;
+use LawFirmManagement\Services\UserService;
 
 class Application
 {
@@ -61,6 +63,8 @@ class Application
         $appointmentRepository = new AppointmentRepository($pdo);
         
         $documentRepository = new DocumentRepository($pdo); 
+
+        $dashboardRepository = new DashboardRepository($pdo);
 
         // Authentication
         $auth = new Auth($userRepository);
@@ -114,6 +118,11 @@ class Application
             $caseAccessService
             );
 
+
+        $dashboardService = new DashboardService(
+            $dashboardRepository
+            );
+
         // Authorization
         $authorization = new Authorization($auth);
 
@@ -123,7 +132,8 @@ class Application
 
         $dashboardController = new DashboardController(
             $auth,
-            $authorization
+            $authorization,
+            $dashboardService
         );
 
         $usersController = new UsersController(
@@ -163,7 +173,6 @@ class Application
 
             $documentController = new DocumentController(
                 $documentservice,
-                $auth
             );
 
         // Middleware
