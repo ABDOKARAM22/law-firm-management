@@ -273,7 +273,6 @@ require __DIR__ . '/../layouts/header.php';
 
                             </div>
 
-
                             <!-- Lawyer -->
 
                             <div class="col-md-6">
@@ -285,49 +284,62 @@ require __DIR__ . '/../layouts/header.php';
                                     المحامي المسؤول
                                 </label>
 
-                                <select
-                                    id="assigned_lawyer_id"
-                                    name="assigned_lawyer_id"
-                                    class="form-select<?= isset($errors['assigned_lawyer_id']) ? ' is-invalid' : '' ?>"
-                                >
+                                <?php if ($user['role'] === 'lawyer'): ?>
 
-                                    <option value="">
-                                        اختر المحامي
-                                    </option>
-
-                                    <?php foreach ($lawyers as $lawyer): ?>
-
-                                        <option
-                                            value="<?= (int) $lawyer['id'] ?>"
-                                            <?= (string) $assignedLawyerId === (string) $lawyer['id']
-                                                ? 'selected'
-                                                : '' ?>
-                                        >
-                                            <?= htmlspecialchars(
-                                                $lawyer['name'],
-                                                ENT_QUOTES,
-                                                'UTF-8'
-                                            ) ?>
-                                        </option>
-
-                                    <?php endforeach; ?>
-
-                                </select>
-
-                                <?php if (isset($errors['assigned_lawyer_id'])): ?>
-
-                                    <div class="invalid-feedback">
+                                    <div class="form-control bg-light">
                                         <?= htmlspecialchars(
-                                            $errors['assigned_lawyer_id'],
+                                            $case['lawyer_name'],
                                             ENT_QUOTES,
                                             'UTF-8'
                                         ) ?>
                                     </div>
 
+                                <?php else: ?>
+
+                                    <select
+                                        id="assigned_lawyer_id"
+                                        name="assigned_lawyer_id"
+                                        class="form-select<?= isset($errors['assigned_lawyer_id']) ? ' is-invalid' : '' ?>"
+                                    >
+
+                                        <option value="">
+                                            اختر المحامي
+                                        </option>
+
+                                        <?php foreach ($lawyers as $lawyer): ?>
+
+                                            <option
+                                                value="<?= (int) $lawyer['id'] ?>"
+                                                <?= (string) $assignedLawyerId === (string) $lawyer['id']
+                                                    ? 'selected'
+                                                    : '' ?>
+                                            >
+                                                <?= htmlspecialchars(
+                                                    $lawyer['name'],
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                ) ?>
+                                            </option>
+
+                                        <?php endforeach; ?>
+
+                                    </select>
+
+                                    <?php if (isset($errors['assigned_lawyer_id'])): ?>
+
+                                        <div class="invalid-feedback">
+                                            <?= htmlspecialchars(
+                                                $errors['assigned_lawyer_id'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+                                        </div>
+
+                                    <?php endif; ?>
+
                                 <?php endif; ?>
 
                             </div>
-
 
                             <!-- Case Type -->
 

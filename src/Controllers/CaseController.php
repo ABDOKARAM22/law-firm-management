@@ -379,6 +379,7 @@ class CaseController
 
         if ($user['role'] === 'lawyer') {
             $clientId = $case['client_id'];
+            $assignedLawyerId = $case['assigned_lawyer_id'];
         }
 
         $values = [
