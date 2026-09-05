@@ -119,6 +119,7 @@ class ClientService
 
             ->required('phone', $phone)
             ->string('phone', $phone)
+            ->egyptianPhone('phone', $phone)
 
             ->string('email', $email)
             ->email('email', $email)
