@@ -124,6 +124,41 @@ class UserService
             ]);
         }
 
+
+
+    $currentUser = $this->userRepository->findById($id);
+
+    if ($currentUser === null) {
+        throw new ValidationException([
+            'user' => 'المستخدم غير موجود.'
+        ]);
+    }
+
+    $isCurrentUserActiveAdmin =
+        $currentUser['role'] === 'admin'
+        && $currentUser['status'] === 'active';
+
+    $isRemovingAdminRole =
+        $currentUser['role'] === 'admin'
+        && $role !== 'admin';
+
+    $isDeactivatingAdmin =
+        $currentUser['role'] === 'admin'
+        && $status === 'inactive';
+
+    if (
+        $isCurrentUserActiveAdmin
+        && ($isRemovingAdminRole || $isDeactivatingAdmin)
+    ) {
+        $activeAdmins =
+            $this->userRepository->countActiveAdminsExcept($id);
+
+        if ($activeAdmins === 0) {
+            throw new ValidationException([
+                'role' => 'لا يمكن إزالة صلاحيات آخر مدير نشط في النظام.'
+            ]);
+        }
+    }
         if ($id === $this->auth->id() && $status === 'inactive') {
             throw new ValidationException([
                 'status' => 'لا يمكنك تعطيل حسابك الحالي.'

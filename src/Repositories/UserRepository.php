@@ -188,4 +188,23 @@ class UserRepository
         return $statement->fetchAll();
     }
 
+    public function countActiveAdminsExcept(int $userId): int
+    {
+        $statement = $this->db->prepare(
+            'SELECT COUNT(*)
+            FROM users
+            WHERE role = :role
+            AND status = :status
+            AND id != :id'
+        );
+
+        $statement->execute([
+            'role' => 'admin',
+            'status' => 'active',
+            'id' => $userId,
+        ]);
+
+        return (int) $statement->fetchColumn();
+    }
+
 }
