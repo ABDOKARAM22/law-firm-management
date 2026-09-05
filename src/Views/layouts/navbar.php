@@ -1,10 +1,9 @@
 <?php
 
 use LawFirmManagement\Core\Csrf;
-use LawFirmManagement\Core\Session;
 
-$userName = Session::get('user_name');
-$userRole = Session::get('user_role');
+$userName = $user['name'] ?? '';
+$userRole = $user['role'] ?? '';
 
 $roleLabels = [
     'admin'  => 'مدير',
@@ -20,18 +19,6 @@ $roleLabel = $roleLabels[$userRole] ?? 'مستخدم';
 
     <div class="container-fluid">
 
-        <!-- Mobile Menu Button -->
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbar-menu"
-            aria-controls="navbar-menu"
-            aria-expanded="false"
-            aria-label="فتح القائمة"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
 
         <!-- Page Title -->
