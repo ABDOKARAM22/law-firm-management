@@ -125,9 +125,11 @@ class Router
 
                 $this->authMiddleware->handle();
 
-                $clients = $this->clientController->index();
+                $this->roleMiddleware->handle('admin', 'staff');
 
-            break;
+                $this->clientController->index();
+
+                break;
             
             
 
@@ -189,7 +191,7 @@ class Router
 
             break;
 
-            
+
             case 'cases/create':
 
                 $this->authMiddleware->handle();

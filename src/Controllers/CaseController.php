@@ -103,6 +103,8 @@ class CaseController
 
         $caseTypes = $this->caseTypeRepository->all();
 
+        $currentUser = $this->auth->user();
+        
         require __DIR__ . '/../Views/cases/index.php';
     }
 
@@ -220,7 +222,18 @@ class CaseController
             return;
         }
 
-        $clients = $this->clientService->all();
+        $user = $this->auth->user();
+
+        if ($user['role'] === 'lawyer') {
+            $clients = [
+                [
+                    'id' => $case['client_id'],
+                    'name' => $case['client_name'],
+                ]
+            ];
+        } else {
+            $clients = $this->clientService->all();
+        }
 
         $lawyers = $this->userRepository->allActiveLawyers();
 
@@ -337,6 +350,14 @@ class CaseController
         }
 
 
+        $case = $this->caseService->find($id);
+
+        if ($case === false) {
+            http_response_code(404);
+            echo 'Case not found';
+            return;
+        }
+
         if (!$this->caseAccessService->canAccess($id)) {
         http_response_code(403);
         echo 'Forbidden';
@@ -353,6 +374,12 @@ class CaseController
         $status = $_POST['status'] ?? '';
         $description = $_POST['description'] ?? '';
         $filingDate = $_POST['filing_date'] ?? '';
+
+        $user = $this->auth->user();
+
+        if ($user['role'] === 'lawyer') {
+            $clientId = $case['client_id'];
+        }
 
         $values = [
             &$caseNumber,

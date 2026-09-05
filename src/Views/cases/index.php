@@ -1,285 +1,135 @@
 <?php
 
-use LawFirmManagement\Core\Flash;
+$old = \LawFirmManagement\Core\Flash::get('old') ?? [];
 
-$success = Flash::get('success');
-$errors = Flash::get('errors');
+$search = $search ?? '';
+$status = $status ?? null;
+$caseTypeId = $caseTypeId ?? null;
+$lawyerId = $lawyerId ?? null;
+$page = $page ?? 1;
+$totalPages = $totalPages ?? 1;
 
 ?>
 
-<!DOCTYPE html>
-
-<html lang="ar" dir="rtl">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <title>القضايا</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background: #f5f5f5;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #333;
-            color: white;
-            border-radius: 5px;
-        }
-
-        .edit-btn {
-            display: inline-block;
-            padding: 7px 12px;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
-        }
-
-        .success {
-            padding: 10px;
-            background: #d4edda;
-            color: #155724;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .filters {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-
-        .filters div {
-            margin-bottom: 10px;
-        }
-
-        .filters input,
-        .filters select {
-            padding: 8px;
-            margin-right: 5px;
-        }
-
-        .filters button {
-            padding: 8px 15px;
-            cursor: pointer;
-        }
-
-        .clear-btn {
-            display: inline-block;
-            padding: 8px 15px;
-            margin-right: 5px;
-            background: #777;
-            color: white;
-            border-radius: 5px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-
-        th {
-            background: #eee;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 30px;
-            background: white;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a,
-        .pagination span {
-            display: inline-block;
-            padding: 8px 12px;
-            margin: 2px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-        }
-
-        .pagination .active {
-            background: #333;
-            color: white;
-        }
-
-        .pagination .disabled {
-            color: #aaa;
-        }
-    </style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-    <div class="header">
-
+<div class="page-header">
+    <div>
         <h1>القضايا</h1>
+        <p>إدارة ومتابعة قضايا المكتب.</p>
+    </div>
 
+    <?php if ($currentUser === 'admin'): ?>
         <a href="?route=cases/create" class="btn">
             إضافة قضية
         </a>
+    <?php endif; ?>
+</div>
 
+<!-- Search & Filters -->
+<div class="filters">
+
+    <div class="filter-group">
+        <label for="search">بحث</label>
+        <input
+            type="text"
+            id="search"
+            name="search"
+            value="<?= htmlspecialchars($search, ENT_QUOTES, 'UTF-8') ?>"
+            placeholder="رقم القضية أو عنوانها..."
+        >
+    </div>
+
+    <div class="filter-group">
+        <label for="status">الحالة</label>
+
+        <select id="status" name="status">
+
+            <option value="">كل الحالات</option>
+
+            <option
+                value="pending"
+                <?= $status === 'pending' ? 'selected' : '' ?>
+            >
+                قيد الانتظار
+            </option>
+
+            <option
+                value="active"
+                <?= $status === 'active' ? 'selected' : '' ?>
+            >
+                نشطة
+            </option>
+
+            <option
+                value="on_hold"
+                <?= $status === 'on_hold' ? 'selected' : '' ?>
+            >
+                معلقة
+            </option>
+
+            <option
+                value="closed"
+                <?= $status === 'closed' ? 'selected' : '' ?>
+            >
+                مغلقة
+            </option>
+
+            <option
+                value="cancelled"
+                <?= $status === 'cancelled' ? 'selected' : '' ?>
+            >
+                ملغاة
+            </option>
+
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <label for="case_type_id">نوع القضية</label>
+
+        <select id="case_type_id" name="case_type_id">
+
+            <option value="">كل الأنواع</option>
+
+            <?php foreach ($caseTypes as $caseType): ?>
+
+                <option
+                    value="<?= (int) $caseType['id'] ?>"
+                    <?= (int) $caseTypeId === (int) $caseType['id'] ? 'selected' : '' ?>
+                >
+                    <?= htmlspecialchars(
+                        $caseType['name'],
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
+                </option>
+
+            <?php endforeach; ?>
+
+        </select>
     </div>
 
 
-    <?php if ($success): ?>
+    <?php if ($currentUser['role'] !== 'lawyer'): ?>
 
-        <div class="success">
-            <?= htmlspecialchars($success) ?>
-        </div>
+        <div class="filter-group">
 
-    <?php endif; ?>
+            <label for="lawyer_id">المحامي</label>
 
+            <select id="lawyer_id" name="lawyer_id">
 
-    <!-- Search & Filters -->
-
-    <form method="GET" action="" class="filters" id="cases-filter-form">
-
-        <input
-            type="hidden"
-            name="route"
-            value="cases"
-        >
-
-        <div>
-
-            <label for="search">
-                بحث:
-            </label>
-
-            <input
-                type="text"
-                id="search"
-                name="search"
-                value="<?= htmlspecialchars($search) ?>"
-                placeholder="رقم القضية أو اسم العميل أو المحامي"
-            >
-
-        </div>
-
-
-        <div>
-
-            <label for="status">
-                الحالة:
-            </label>
-
-            <select
-                name="status"
-                id="status"
-            >
-
-                <option value="">
-                    كل الحالات
-                </option>
-
-                <?php foreach ($allowedStatuses as $allowedStatus): ?>
-
-                    <option
-                        value="<?= htmlspecialchars($allowedStatus) ?>"
-                        <?= $status === $allowedStatus ? 'selected' : '' ?>
-                    >
-                        <?= htmlspecialchars($allowedStatus) ?>
-                    </option>
-
-                <?php endforeach; ?>
-
-            </select>
-
-        </div>
-
-
-        <div>
-
-            <label for="case_type_id">
-                نوع القضية:
-            </label>
-
-            <select
-                name="case_type_id"
-                id="case_type_id"
-            >
-
-                <option value="">
-                    كل الأنواع
-                </option>
-
-                <?php foreach ($caseTypes as $caseType): ?>
-
-                    <option
-                        value="<?= (int) $caseType['id'] ?>"
-                        <?= $caseTypeId === (int) $caseType['id'] ? 'selected' : '' ?>
-                    >
-                        <?= htmlspecialchars($caseType['name']) ?>
-                    </option>
-
-                <?php endforeach; ?>
-
-            </select>
-
-        </div>
-
-
-        <div>
-
-            <label for="lawyer_id">
-                المحامي:
-            </label>
-
-            <select
-                name="lawyer_id"
-                id="lawyer_id"
-            >
-
-                <option value="">
-                    كل المحامين
-                </option>
+                <option value="">كل المحامين</option>
 
                 <?php foreach ($lawyers as $lawyer): ?>
 
                     <option
                         value="<?= (int) $lawyer['id'] ?>"
-                        <?= $lawyerId === (int) $lawyer['id'] ? 'selected' : '' ?>
+                        <?= (int) $lawyerId === (int) $lawyer['id'] ? 'selected' : '' ?>
                     >
-                        <?= htmlspecialchars($lawyer['name']) ?>
+                        <?= htmlspecialchars(
+                            $lawyer['name'],
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>
                     </option>
 
                 <?php endforeach; ?>
@@ -288,262 +138,377 @@ $errors = Flash::get('errors');
 
         </div>
 
+    <?php endif; ?>
 
-        <button type="submit">
-            بحث
-        </button>
-
-
-        <a
-            href="?route=cases"
-            class="clear-btn"
-        >
-            مسح الفلاتر
-        </a>
-
-    </form>
+</div>
 
 
-    <?php if (empty($cases)): ?>
+<!-- Cases Table -->
+<div class="table-container">
 
-        <div class="empty">
+    <table>
 
-            لا توجد قضايا مطابقة للبحث.
+        <thead>
 
-        </div>
+            <tr>
 
-    <?php else: ?>
+                <th>#</th>
 
+                <th>رقم القضية</th>
 
-        <table>
+                <th>عنوان القضية</th>
 
-            <thead>
+                <th>العميل</th>
 
-                <tr>
+                <th>المحامي</th>
 
-                    <th>#</th>
+                <th>نوع القضية</th>
 
-                    <th>رقم القضية</th>
+                <th>المحكمة</th>
 
-                    <th>عنوان القضية</th>
+                <th>الحالة</th>
 
-                    <th>العميل</th>
+                <th>تاريخ القيد</th>
 
-                    <th>المحامي</th>
+                <th>الإجراءات</th>
 
-                    <th>نوع القضية</th>
+            </tr>
 
-                    <th>المحكمة</th>
-
-                    <th>الحالة</th>
-
-                    <th>تاريخ القيد</th>
-
-                    <th>الإجراءات</th>
-
-                </tr>
-
-            </thead>
+        </thead>
 
 
-            <tbody id="cases-table-body">
+        <!--
+            مهم:
+            الـ tbody موجود دائمًا حتى لو لم توجد نتائج.
+            الـ JavaScript يعتمد عليه في AJAX.
+        -->
+        <tbody id="cases-table-body">
 
-            <?php foreach ($cases as $case): ?>
+            <?php if (empty($cases)): ?>
 
                 <tr>
 
-                    <td>
-                        <?= (int) $case['id'] ?>
-                    </td>
+                    <td colspan="10" class="empty">
 
-                    <td>
-                        <?= htmlspecialchars($case['case_number']) ?>
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['title']) ?>
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['client_name']) ?>
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['lawyer_name']) ?>
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['case_type_name']) ?>
-                    </td>
-
-                    <td>
-
-                        <?= htmlspecialchars($case['court_name']) ?>
-
-                        <?php if (!empty($case['court_number'])): ?>
-
-                            -
-                            <?= htmlspecialchars($case['court_number']) ?>
-
-                        <?php endif; ?>
-
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['status']) ?>
-                    </td>
-
-                    <td>
-                        <?= htmlspecialchars($case['filing_date'] ?? '') ?>
-                    </td>
-
-                    <td>
-
-                        <a
-                            href="?route=cases/edit&id=<?= (int) $case['id'] ?>"
-                            class="edit-btn"
-                        >
-                            تعديل
-                        </a>
-
-                        <a
-                            href="?route=cases/show&id=<?= (int) $case['id'] ?>"
-                            class="edit-btn"
-                        >
-                            عرض
-                        </a>
+                        لا توجد قضايا مطابقة للبحث.
 
                     </td>
 
                 </tr>
 
-            <?php endforeach; ?>
+            <?php else: ?>
 
-            </tbody>
+                <?php foreach ($cases as $case): ?>
 
-        </table>
+                    <tr>
+
+                        <td>
+                            <?= (int) $case['id'] ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['case_number'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['title'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['client_name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['lawyer_name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['case_type_name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+
+                            <?= htmlspecialchars(
+                                $case['court_name'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+
+                            <?php if (!empty($case['court_number'])): ?>
+
+                                -
+                                <?= htmlspecialchars(
+                                    $case['court_number'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+
+                            <?php endif; ?>
+
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['status'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars(
+                                $case['filing_date'] ?? '',
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="?route=cases/edit&id=<?= (int) $case['id'] ?>"
+                                class="edit-btn"
+                            >
+                                تعديل
+                            </a>
+
+                            <a
+                                href="?route=cases/show&id=<?= (int) $case['id'] ?>"
+                                class="edit-btn"
+                            >
+                                عرض
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+
+        </tbody>
+
+    </table>
+
+</div>
 
 
-        <!-- Pagination -->
+<!-- Pagination -->
 
-        <?php if ($totalPages > 1): ?>
+<!--
+    مهم:
+    الـ div موجود دائمًا.
+    الـ JavaScript سيقوم بإخفائه/تعبئته حسب عدد الصفحات.
+-->
+<div
+    class="pagination"
+    id="cases-pagination"
+>
 
-            <div class="pagination" id="cases-pagination">
+    <?php if ($totalPages > 1): ?>
 
-                <?php
+        <?php
 
-                $paginationParams = [
-                    'route' => 'cases',
-                    'search' => $search,
-                    'status' => $status,
-                    'case_type_id' => $caseTypeId,
-                    'lawyer_id' => $lawyerId,
-                ];
+        $paginationParams = [
+            'route' => 'cases',
+            'search' => $search,
+            'status' => $status,
+            'case_type_id' => $caseTypeId,
+            'lawyer_id' => $lawyerId,
+        ];
 
-                ?>
-
-
-                <?php if ($page > 1): ?>
-
-                    <?php
-                    $paginationParams['page'] = $page - 1;
-                    ?>
-
-                    <a
-                        href="?<?= htmlspecialchars(http_build_query($paginationParams)) ?>"
-                    >
-                        السابق
-                    </a>
-
-                <?php else: ?>
-
-                    <span class="disabled">
-                        السابق
-                    </span>
-
-                <?php endif; ?>
+        ?>
 
 
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+        <!-- Previous -->
 
-                    <?php
-                    $paginationParams['page'] = $i;
-                    ?>
+        <?php if ($page > 1): ?>
 
-                    <?php if ($i === $page): ?>
+            <?php
+            $paginationParams['page'] = $page - 1;
+            ?>
 
-                        <span class="active">
-                            <?= $i ?>
-                        </span>
+            <a
+                href="?<?= htmlspecialchars(
+                    http_build_query($paginationParams),
+                    ENT_QUOTES,
+                    'UTF-8'
+                ) ?>"
+            >
+                السابق
+            </a>
 
-                    <?php else: ?>
+        <?php else: ?>
 
-                        <a
-                            href="?<?= htmlspecialchars(http_build_query($paginationParams)) ?>"
-                        >
-                            <?= $i ?>
-                        </a>
-
-                    <?php endif; ?>
-
-                <?php endfor; ?>
-
-
-                <?php if ($page < $totalPages): ?>
-
-                    <?php
-                    $paginationParams['page'] = $page + 1;
-                    ?>
-
-                    <a
-                        href="?<?= htmlspecialchars(http_build_query($paginationParams)) ?>"
-                    >
-                        التالي
-                    </a>
-
-                <?php else: ?>
-
-                    <span class="disabled">
-                        التالي
-                    </span>
-
-                <?php endif; ?>
-
-            </div>
+            <span class="disabled">
+                السابق
+            </span>
 
         <?php endif; ?>
 
 
-    <?php endif; ?>
+        <!-- Pages -->
 
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+            <?php
+            $paginationParams['page'] = $i;
+            ?>
+
+            <?php if ($i === $page): ?>
+
+                <span class="active">
+                    <?= $i ?>
+                </span>
+
+            <?php else: ?>
+
+                <a
+                    href="?<?= htmlspecialchars(
+                        http_build_query($paginationParams),
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>"
+                >
+                    <?= $i ?>
+                </a>
+
+            <?php endif; ?>
+
+        <?php endfor; ?>
+
+
+        <!-- Next -->
+
+        <?php if ($page < $totalPages): ?>
+
+            <?php
+            $paginationParams['page'] = $page + 1;
+            ?>
+
+            <a
+                href="?<?= htmlspecialchars(
+                    http_build_query($paginationParams),
+                    ENT_QUOTES,
+                    'UTF-8'
+                ) ?>"
+            >
+                التالي
+            </a>
+
+        <?php else: ?>
+
+            <span class="disabled">
+                التالي
+            </span>
+
+        <?php endif; ?>
+
+    <?php endif; ?>
 
 </div>
 
+
 <script>
-    function createCell(value) {
-        const cell = document.createElement('td');
 
-        cell.textContent = value ?? '';
+    /*
+     * ============================================================
+     * AJAX CASE SEARCH / FILTER / PAGINATION
+     * ============================================================
+     */
 
-        return cell;
+
+    const searchInput = document.getElementById('search');
+
+    const statusSelect = document.getElementById('status');
+
+    const caseTypeSelect = document.getElementById('case_type_id');
+
+    const lawyerSelect = document.getElementById('lawyer_id');
+
+    const tableBody = document.getElementById('cases-table-body');
+
+    const paginationContainer =
+        document.getElementById('cases-pagination');
+
+
+    /*
+     * ------------------------------------------------------------
+     * Build URL Parameters
+     * ------------------------------------------------------------
+     */
+
+    function buildParams(page = 1) {
+
+        const params = new URLSearchParams();
+
+        params.set('search', searchInput.value.trim());
+
+        params.set('status', statusSelect.value);
+
+        params.set(
+            'case_type_id',
+            caseTypeSelect.value
+        );
+
+        if (lawyerSelect) {
+
+            params.set(
+                'lawyer_id',
+                lawyerSelect.value
+            );
+
+        }
+
+        params.set('page', page);
+
+        return params;
     }
 
 
+    /*
+     * ------------------------------------------------------------
+     * Render Cases
+     * ------------------------------------------------------------
+     */
+
     function renderCases(cases) {
-        const tableBody = document.getElementById('cases-table-body');
 
         tableBody.innerHTML = '';
 
-
-        if (cases.length === 0) {
+        if (!cases.length) {
 
             const row = document.createElement('tr');
 
             const cell = document.createElement('td');
 
-            cell.colSpan = 11;
+            cell.colSpan = 10;
 
-            cell.textContent = 'لا توجد نتائج مطابقة';
+            cell.className = 'empty';
+
+            cell.textContent =
+                'لا توجد قضايا مطابقة للبحث.';
 
             row.appendChild(cell);
 
@@ -557,189 +522,523 @@ $errors = Flash::get('errors');
 
             const row = document.createElement('tr');
 
-            row.appendChild(createCell(caseItem.id));
-            row.appendChild(createCell(caseItem.case_number));
-            row.appendChild(createCell(caseItem.title));
-            row.appendChild(createCell(caseItem.client_name));
-            row.appendChild(createCell(caseItem.lawyer_name));
-            row.appendChild(createCell(caseItem.case_type_name));
-            row.appendChild(createCell(caseItem.court_name));
+
+            /*
+             * ID
+             */
+
+            const idCell =
+                document.createElement('td');
+
+            idCell.textContent =
+                caseItem.id;
+
+            row.appendChild(idCell);
 
 
-            const courtCell = row.lastElementChild;
+            /*
+             * Case Number
+             */
+
+            const caseNumberCell =
+                document.createElement('td');
+
+            caseNumberCell.textContent =
+                caseItem.case_number;
+
+            row.appendChild(caseNumberCell);
+
+
+            /*
+             * Title
+             */
+
+            const titleCell =
+                document.createElement('td');
+
+            titleCell.textContent =
+                caseItem.title;
+
+            row.appendChild(titleCell);
+
+
+            /*
+             * Client
+             */
+
+            const clientCell =
+                document.createElement('td');
+
+            clientCell.textContent =
+                caseItem.client_name;
+
+            row.appendChild(clientCell);
+
+
+            /*
+             * Lawyer
+             */
+
+            const lawyerCell =
+                document.createElement('td');
+
+            lawyerCell.textContent =
+                caseItem.lawyer_name;
+
+            row.appendChild(lawyerCell);
+
+
+            /*
+             * Case Type
+             */
+
+            const caseTypeCell =
+                document.createElement('td');
+
+            caseTypeCell.textContent =
+                caseItem.case_type_name;
+
+            row.appendChild(caseTypeCell);
+
+
+            /*
+             * Court
+             */
+
+            const courtCell =
+                document.createElement('td');
+
+            courtCell.textContent =
+                caseItem.court_name || '';
 
             if (caseItem.court_number) {
-                courtCell.textContent += ' - ' + caseItem.court_number;
+
+                courtCell.textContent +=
+                    ' - ' + caseItem.court_number;
+
             }
 
-
-            row.appendChild(createCell(caseItem.status));
-            row.appendChild(createCell(caseItem.filing_date));
+            row.appendChild(courtCell);
 
 
-            const actionsCell = document.createElement('td');
+            /*
+             * Status
+             */
+
+            const statusCell =
+                document.createElement('td');
+
+            statusCell.textContent =
+                caseItem.status;
+
+            row.appendChild(statusCell);
 
 
-            const editLink = document.createElement('a');
+            /*
+             * Filing Date
+             */
 
-            editLink.href = '?route=cases/edit&id=' + caseItem.id;
-            editLink.textContent = 'تعديل';
-            editLink.className = 'edit-btn';
+            const filingDateCell =
+                document.createElement('td');
+
+            filingDateCell.textContent =
+                caseItem.filing_date || '';
+
+            row.appendChild(filingDateCell);
 
 
-            const showLink = document.createElement('a');
+            /*
+             * Actions
+             */
 
-            showLink.href = '?route=cases/show&id=' + caseItem.id;
-            showLink.textContent = 'عرض';
-            showLink.className = 'edit-btn';
+            const actionsCell =
+                document.createElement('td');
+
+
+            const editLink =
+                document.createElement('a');
+
+            editLink.href =
+                '?route=cases/edit&id=' +
+                encodeURIComponent(caseItem.id);
+
+            editLink.className =
+                'edit-btn';
+
+            editLink.textContent =
+                'تعديل';
+
+
+            const showLink =
+                document.createElement('a');
+
+            showLink.href =
+                '?route=cases/show&id=' +
+                encodeURIComponent(caseItem.id);
+
+            showLink.className =
+                'edit-btn';
+
+            showLink.textContent =
+                'عرض';
 
 
             actionsCell.appendChild(editLink);
-            actionsCell.appendChild(document.createTextNode(' '));
-            actionsCell.appendChild(showLink);
 
+            actionsCell.appendChild(showLink);
 
             row.appendChild(actionsCell);
 
+
             tableBody.appendChild(row);
+
         });
+
     }
 
 
-    function renderPagination(currentPage, totalPages) {
+    /*
+     * ------------------------------------------------------------
+     * Render Pagination
+     * ------------------------------------------------------------
+     */
 
-        const pagination = document.getElementById('cases-pagination');
+    function renderPagination(
+        currentPage,
+        totalPages
+    ) {
 
-        pagination.innerHTML = '';
-
+        paginationContainer.innerHTML = '';
 
         if (totalPages <= 1) {
-            pagination.style.display = 'none';
 
             return;
         }
 
 
-        pagination.style.display = '';
+        /*
+         * Previous
+         */
+
+        if (currentPage > 1) {
+
+            const previous =
+                document.createElement('a');
+
+            previous.href = '#';
+
+            previous.textContent =
+                'السابق';
+
+            previous.addEventListener(
+                'click',
+                function (event) {
+
+                    event.preventDefault();
+
+                    loadCases(
+                        currentPage - 1
+                    );
+
+                }
+            );
+
+            paginationContainer.appendChild(
+                previous
+            );
+
+        } else {
+
+            const previous =
+                document.createElement('span');
+
+            previous.className =
+                'disabled';
+
+            previous.textContent =
+                'السابق';
+
+            paginationContainer.appendChild(
+                previous
+            );
+
+        }
 
 
-        for (let page = 1; page <= totalPages; page++) {
+        /*
+         * Pages
+         */
 
-            const link = document.createElement('a');
+        for (
+            let i = 1;
+            i <= totalPages;
+            i++
+        ) {
 
-            link.href = '#';
+            if (i === currentPage) {
 
-            link.textContent = page;
+                const active =
+                    document.createElement('span');
+
+                active.className =
+                    'active';
+
+                active.textContent =
+                    i;
+
+                paginationContainer.appendChild(
+                    active
+                );
+
+            } else {
+
+                const pageLink =
+                    document.createElement('a');
+
+                pageLink.href = '#';
+
+                pageLink.textContent =
+                    i;
+
+                pageLink.addEventListener(
+                    'click',
+                    function (event) {
+
+                        event.preventDefault();
+
+                        loadCases(i);
+
+                    }
+                );
+
+                paginationContainer.appendChild(
+                    pageLink
+                );
+
+            }
+
+        }
 
 
-            if (page === currentPage) {
-                link.className = 'active';
+        /*
+         * Next
+         */
+
+        if (currentPage < totalPages) {
+
+            const next =
+                document.createElement('a');
+
+            next.href = '#';
+
+            next.textContent =
+                'التالي';
+
+            next.addEventListener(
+                'click',
+                function (event) {
+
+                    event.preventDefault();
+
+                    loadCases(
+                        currentPage + 1
+                    );
+
+                }
+            );
+
+            paginationContainer.appendChild(
+                next
+            );
+
+        } else {
+
+            const next =
+                document.createElement('span');
+
+            next.className =
+                'disabled';
+
+            next.textContent =
+                'التالي';
+
+            paginationContainer.appendChild(
+                next
+            );
+
+        }
+
+    }
+
+
+    /*
+     * ------------------------------------------------------------
+     * Load Cases
+     * ------------------------------------------------------------
+     */
+
+    async function loadCases(page = 1) {
+
+        try {
+
+            const params =
+                buildParams(page);
+
+
+            const response =
+                await fetch(
+                    '?route=cases/search&' +
+                    params.toString(),
+                    {
+                        headers: {
+                            'X-Requested-With':
+                                'XMLHttpRequest'
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    'HTTP error: ' +
+                    response.status
+                );
+
             }
 
 
-            link.addEventListener('click', function (event) {
-
-                event.preventDefault();
-
-                loadCases(page);
-
-            });
+            const data =
+                await response.json();
 
 
-            pagination.appendChild(link);
-        }
-    }
+            if (!data.success) {
 
-
-    const form = document.getElementById('cases-filter-form');
-
-    function loadCases(page = 1) {
-
-        const formData = new FormData(form);
-
-        const params = new URLSearchParams(formData);
-
-        params.set('route', 'cases/search');
-
-        params.set('page', page);
-
-
-        fetch('?' + params.toString())
-            .then(response => {
-
-                if (!response.ok) {
-                    throw new Error('حدث خطأ أثناء جلب البيانات');
-                }
-
-                return response.json();
-
-            })
-            .then(data => {
-
-                if (data.success) {
-
-                    renderCases(data.cases);
-
-                    renderPagination(
-                        data.page,
-                        data.totalPages
-                    );
-
-                } else {
-
-                    throw new Error('فشل في جلب القضايا');
-
-                }
-
-            })
-            .catch(error => {
-
-                console.error(error);
-
-                const tableBody = document.getElementById(
-                    'cases-table-body'
+                throw new Error(
+                    'Failed to load cases'
                 );
 
-                tableBody.innerHTML = '';
+            }
 
 
-                const row = document.createElement('tr');
-
-                const cell = document.createElement('td');
-
-                cell.colSpan = 11;
-
-                cell.textContent =
-                    'حدث خطأ أثناء تحميل البيانات';
-
-                row.appendChild(cell);
-
-                tableBody.appendChild(row);
+            renderCases(
+                data.cases
+            );
 
 
-                const pagination =
-                    document.getElementById('cases-pagination');
+            renderPagination(
+                data.page,
+                data.totalPages
+            );
 
-                pagination.innerHTML = '';
 
-                pagination.style.display = 'none';
+        } catch (error) {
 
-            });
+            console.error(error);
+
+            tableBody.innerHTML = '';
+
+            const row =
+                document.createElement('tr');
+
+            const cell =
+                document.createElement('td');
+
+            cell.colSpan = 10;
+
+            cell.className = 'empty';
+
+            cell.textContent =
+                'حدث خطأ أثناء تحميل البيانات.';
+
+            row.appendChild(cell);
+
+            tableBody.appendChild(row);
+
+            paginationContainer.innerHTML = '';
+
+        }
+
     }
 
 
-    form.addEventListener('submit', function (event) {
+    /*
+     * ------------------------------------------------------------
+     * Search
+     * ------------------------------------------------------------
+     */
 
-        event.preventDefault();
+    let searchTimeout;
 
-        loadCases(1);
+    searchInput.addEventListener(
+        'input',
+        function () {
 
-    });
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(
+                function () {
+
+                    loadCases(1);
+
+                },
+                300
+            );
+
+        }
+    );
 
 
-    loadCases();
+    /*
+     * ------------------------------------------------------------
+     * Status Filter
+     * ------------------------------------------------------------
+     */
+
+    statusSelect.addEventListener(
+        'change',
+        function () {
+
+            loadCases(1);
+
+        }
+    );
+
+
+    /*
+     * ------------------------------------------------------------
+     * Case Type Filter
+     * ------------------------------------------------------------
+     */
+
+    caseTypeSelect.addEventListener(
+        'change',
+        function () {
+
+            loadCases(1);
+
+        }
+    );
+
+
+    /*
+     * ------------------------------------------------------------
+     * Lawyer Filter
+     * ------------------------------------------------------------
+     */
+
+    if (lawyerSelect) {
+
+        lawyerSelect.addEventListener(
+            'change',
+            function () {
+
+                loadCases(1);
+
+            }
+        );
+
+    }
+
+
 </script>
-
-</body>
-
-</html>
