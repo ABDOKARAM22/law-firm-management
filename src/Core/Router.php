@@ -181,7 +181,15 @@ class Router
 
             break;
 
+            case 'cases/search':
 
+            $this->authMiddleware->handle();
+
+            $this->caseController->search();
+
+            break;
+
+            
             case 'cases/create':
 
                 $this->authMiddleware->handle();

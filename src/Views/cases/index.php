@@ -171,7 +171,7 @@ $errors = Flash::get('errors');
 
     <!-- Search & Filters -->
 
-    <form method="GET" action="" class="filters">
+    <form method="GET" action="" class="filters" id="cases-filter-form">
 
         <input
             type="hidden"
@@ -346,7 +346,7 @@ $errors = Flash::get('errors');
             </thead>
 
 
-            <tbody>
+            <tbody id="cases-table-body">
 
             <?php foreach ($cases as $case): ?>
 
@@ -428,7 +428,7 @@ $errors = Flash::get('errors');
 
         <?php if ($totalPages > 1): ?>
 
-            <div class="pagination">
+            <div class="pagination" id="cases-pagination">
 
                 <?php
 
@@ -518,6 +518,227 @@ $errors = Flash::get('errors');
 
 
 </div>
+
+<script>
+    function createCell(value) {
+        const cell = document.createElement('td');
+
+        cell.textContent = value ?? '';
+
+        return cell;
+    }
+
+
+    function renderCases(cases) {
+        const tableBody = document.getElementById('cases-table-body');
+
+        tableBody.innerHTML = '';
+
+
+        if (cases.length === 0) {
+
+            const row = document.createElement('tr');
+
+            const cell = document.createElement('td');
+
+            cell.colSpan = 11;
+
+            cell.textContent = 'لا توجد نتائج مطابقة';
+
+            row.appendChild(cell);
+
+            tableBody.appendChild(row);
+
+            return;
+        }
+
+
+        cases.forEach(caseItem => {
+
+            const row = document.createElement('tr');
+
+            row.appendChild(createCell(caseItem.id));
+            row.appendChild(createCell(caseItem.case_number));
+            row.appendChild(createCell(caseItem.title));
+            row.appendChild(createCell(caseItem.client_name));
+            row.appendChild(createCell(caseItem.lawyer_name));
+            row.appendChild(createCell(caseItem.case_type_name));
+            row.appendChild(createCell(caseItem.court_name));
+
+
+            const courtCell = row.lastElementChild;
+
+            if (caseItem.court_number) {
+                courtCell.textContent += ' - ' + caseItem.court_number;
+            }
+
+
+            row.appendChild(createCell(caseItem.status));
+            row.appendChild(createCell(caseItem.filing_date));
+
+
+            const actionsCell = document.createElement('td');
+
+
+            const editLink = document.createElement('a');
+
+            editLink.href = '?route=cases/edit&id=' + caseItem.id;
+            editLink.textContent = 'تعديل';
+            editLink.className = 'edit-btn';
+
+
+            const showLink = document.createElement('a');
+
+            showLink.href = '?route=cases/show&id=' + caseItem.id;
+            showLink.textContent = 'عرض';
+            showLink.className = 'edit-btn';
+
+
+            actionsCell.appendChild(editLink);
+            actionsCell.appendChild(document.createTextNode(' '));
+            actionsCell.appendChild(showLink);
+
+
+            row.appendChild(actionsCell);
+
+            tableBody.appendChild(row);
+        });
+    }
+
+
+    function renderPagination(currentPage, totalPages) {
+
+        const pagination = document.getElementById('cases-pagination');
+
+        pagination.innerHTML = '';
+
+
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+
+            return;
+        }
+
+
+        pagination.style.display = '';
+
+
+        for (let page = 1; page <= totalPages; page++) {
+
+            const link = document.createElement('a');
+
+            link.href = '#';
+
+            link.textContent = page;
+
+
+            if (page === currentPage) {
+                link.className = 'active';
+            }
+
+
+            link.addEventListener('click', function (event) {
+
+                event.preventDefault();
+
+                loadCases(page);
+
+            });
+
+
+            pagination.appendChild(link);
+        }
+    }
+
+
+    const form = document.getElementById('cases-filter-form');
+
+    function loadCases(page = 1) {
+
+        const formData = new FormData(form);
+
+        const params = new URLSearchParams(formData);
+
+        params.set('route', 'cases/search');
+
+        params.set('page', page);
+
+
+        fetch('?' + params.toString())
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error('حدث خطأ أثناء جلب البيانات');
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                if (data.success) {
+
+                    renderCases(data.cases);
+
+                    renderPagination(
+                        data.page,
+                        data.totalPages
+                    );
+
+                } else {
+
+                    throw new Error('فشل في جلب القضايا');
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(error);
+
+                const tableBody = document.getElementById(
+                    'cases-table-body'
+                );
+
+                tableBody.innerHTML = '';
+
+
+                const row = document.createElement('tr');
+
+                const cell = document.createElement('td');
+
+                cell.colSpan = 11;
+
+                cell.textContent =
+                    'حدث خطأ أثناء تحميل البيانات';
+
+                row.appendChild(cell);
+
+                tableBody.appendChild(row);
+
+
+                const pagination =
+                    document.getElementById('cases-pagination');
+
+                pagination.innerHTML = '';
+
+                pagination.style.display = 'none';
+
+            });
+    }
+
+
+    form.addEventListener('submit', function (event) {
+
+        event.preventDefault();
+
+        loadCases(1);
+
+    });
+
+
+    loadCases();
+</script>
 
 </body>
 
