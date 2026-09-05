@@ -22,145 +22,159 @@ $values = [
     'status' => $old['status'] ?? $hearing['status'],
     'notes' => $old['notes'] ?? ($hearing['notes'] ?? ''),
 ];
+
+$pageTitle = 'تعديل الجلسة';
+
+require __DIR__ . '/../layouts/header.php';
 ?>
 
-<style>
-    .hearing-page {
-        max-width: 850px;
-        margin: 40px auto;
-        padding: 0 20px;
-        direction: rtl;
-        font-family: Arial, sans-serif;
-    }
+<div class="container-xl">
 
-    .hearing-page h1 {
-        margin-bottom: 10px;
-        color: #222;
-    }
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-4">
 
-    .case-info {
-        background: #f5f7fa;
-        border-right: 4px solid #3498db;
-        padding: 15px 18px;
-        margin-bottom: 25px;
-        border-radius: 6px;
-        color: #444;
-    }
+        <div class="row align-items-center">
 
-    .case-info strong {
-        color: #222;
-    }
+            <div class="col">
 
-    .error-box {
-        background: #fff0f0;
-        border: 1px solid #e0a0a0;
-        color: #a33;
-        padding: 12px 18px;
-        margin-bottom: 25px;
-        border-radius: 6px;
-    }
+                <div class="page-pretitle">
+                    الجلسات
+                </div>
 
-    .error-box ul {
-        margin: 0;
-        padding-right: 20px;
-    }
+                <h2 class="page-title">
+                    تعديل بيانات الجلسة
+                </h2>
 
-    .hearing-form {
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 25px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
+            </div>
 
-    .form-group {
-        margin-bottom: 20px;
-    }
+            <div class="col-auto">
 
-    .form-group label {
-        display: block;
-        margin-bottom: 7px;
-        font-weight: bold;
-        color: #333;
-    }
+                <a
+                    href="?route=cases/show&id=<?= (int) $case['id'] ?>"
+                    class="btn btn-outline-secondary"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                    >
+                        <path d="M15 6l-6 6l6 6"></path>
+                    </svg>
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 11px 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 15px;
-        background: #fff;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
+                    العودة للقضية
+                </a>
 
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
-    }
+            </div>
 
-    .form-group textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
+        </div>
 
-    .field-error {
-        display: block;
-        margin-top: 6px;
-        color: #c0392b;
-        font-size: 13px;
-    }
-
-    .submit-btn {
-        border: none;
-        background: #3498db;
-        color: white;
-        padding: 11px 25px;
-        border-radius: 5px;
-        font-size: 15px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .submit-btn:hover {
-        background: #2980b9;
-    }
-
-    .back-link {
-        display: inline-block;
-        margin-top: 18px;
-        color: #3498db;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .back-link:hover {
-        text-decoration: underline;
-    }
-</style>
-
-<div class="hearing-page">
-
-    <h1>تعديل الجلسة</h1>
-
-    <div class="case-info">
-        القضية:
-        <strong>
-            <?= htmlspecialchars($case['case_number']) ?>
-            -
-            <?= htmlspecialchars($case['title']) ?>
-        </strong>
     </div>
 
+    <!-- Case Information -->
+    <div class="card mb-4">
 
+        <div class="card-body">
+
+            <div class="d-flex align-items-center">
+
+                <span class="avatar avatar-md bg-blue-lt me-3">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                    >
+                        <path d="M4 20h16"></path>
+                        <path d="M6 20v-7"></path>
+                        <path d="M10 20v-11"></path>
+                        <path d="M14 20v-5"></path>
+                        <path d="M18 20v-14"></path>
+                    </svg>
+
+                </span>
+
+                <div>
+
+                    <div class="text-secondary small mb-1">
+                        القضية
+                    </div>
+
+                    <div class="fw-bold">
+                        <?= htmlspecialchars($case['case_number']) ?>
+                        -
+                        <?= htmlspecialchars($case['title']) ?>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Validation Errors -->
+    <?php if (!empty($errors)): ?>
+
+        <div class="alert alert-danger mb-4" role="alert">
+
+            <div class="d-flex">
+
+                <div>
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon alert-icon"
+                    >
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M12 8v4"></path>
+                        <path d="M12 16h.01"></path>
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h4 class="alert-title">
+                        يرجى مراجعة البيانات
+                    </h4>
+
+                    <div>
+                        توجد بعض الأخطاء في البيانات المدخلة.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+    <!-- Hearing Form -->
     <form
-        class="hearing-form"
         method="POST"
         action="?route=hearings/edit&id=<?= (int) $hearing['id'] ?>"
     >
@@ -171,130 +185,309 @@ $values = [
             value="<?= htmlspecialchars(Csrf::token()) ?>"
         >
 
-        <div class="form-group">
-            <label for="hearing_date">تاريخ الجلسة</label>
+        <!-- Date & Time -->
+        <div class="card mb-4">
 
-            <input
-                type="date"
-                id="hearing_date"
-                name="hearing_date"
-                value="<?= htmlspecialchars($values['hearing_date']) ?>"
-            >
+            <div class="card-header">
 
-            <?php if (isset($errors['hearing_date'])): ?>
-                <small class="field-error">
-                    <?= htmlspecialchars($errors['hearing_date']) ?>
-                </small>
-            <?php endif; ?>
+                <h3 class="card-title">
+                    موعد الجلسة
+                </h3>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="hearing_date"
+                            class="form-label"
+                        >
+                            تاريخ الجلسة
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="hearing_date"
+                            name="hearing_date"
+                            class="form-control <?= isset($errors['hearing_date']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars($values['hearing_date']) ?>"
+                        >
+
+                        <?php if (isset($errors['hearing_date'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['hearing_date']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="hearing_time"
+                            class="form-label"
+                        >
+                            وقت الجلسة
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="time"
+                            id="hearing_time"
+                            name="hearing_time"
+                            class="form-control <?= isset($errors['hearing_time']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars($values['hearing_time']) ?>"
+                        >
+
+                        <?php if (isset($errors['hearing_time'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['hearing_time']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label for="hearing_time">وقت الجلسة</label>
+        <!-- Court Information -->
+        <div class="card mb-4">
 
-            <input
-                type="time"
-                id="hearing_time"
-                name="hearing_time"
-                value="<?= htmlspecialchars($values['hearing_time']) ?>"
-            >
+            <div class="card-header">
 
-            <?php if (isset($errors['hearing_time'])): ?>
-                <small class="field-error">
-                    <?= htmlspecialchars($errors['hearing_time']) ?>
-                </small>
-            <?php endif; ?>
+                <h3 class="card-title">
+                    بيانات المحكمة
+                </h3>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="court_name"
+                            class="form-label"
+                        >
+                            اسم المحكمة
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="court_name"
+                            name="court_name"
+                            class="form-control <?= isset($errors['court_name']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars($values['court_name']) ?>"
+                        >
+
+                        <?php if (isset($errors['court_name'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['court_name']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="court_number"
+                            class="form-label"
+                        >
+                            رقم الدائرة
+                        </label>
+
+                        <input
+                            type="text"
+                            id="court_number"
+                            name="court_number"
+                            class="form-control"
+                            value="<?= htmlspecialchars($values['court_number']) ?>"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label for="court_name">اسم المحكمة</label>
+        <!-- Hearing Details -->
+        <div class="card mb-4">
 
-            <input
-                type="text"
-                id="court_name"
-                name="court_name"
-                value="<?= htmlspecialchars($values['court_name']) ?>"
-            >
+            <div class="card-header">
 
-            <?php if (isset($errors['court_name'])): ?>
-                <small class="field-error">
-                    <?= htmlspecialchars($errors['court_name']) ?>
-                </small>
-            <?php endif; ?>
-        </div>
+                <h3 class="card-title">
+                    تفاصيل الجلسة
+                </h3>
 
-        <div class="form-group">
-            <label for="court_number">رقم الدائرة</label>
+            </div>
 
-            <input
-                type="text"
-                id="court_number"
-                name="court_number"
-                value="<?= htmlspecialchars($values['court_number']) ?>"
-            >
-        </div>
+            <div class="card-body">
 
-        <div class="form-group">
-            <label for="hearing_type">نوع الجلسة</label>
+                <div class="row">
 
-            <input
-                type="text"
-                id="hearing_type"
-                name="hearing_type"
-                value="<?= htmlspecialchars($values['hearing_type']) ?>"
-            >
+                    <div class="col-md-6 mb-3">
 
-            <?php if (isset($errors['hearing_type'])): ?>
-                <small class="field-error">
-                    <?= htmlspecialchars($errors['hearing_type']) ?>
-                </small>
-            <?php endif; ?>
-        </div>
+                        <label
+                            for="hearing_type"
+                            class="form-label"
+                        >
+                            نوع الجلسة
+                            <span class="text-danger">*</span>
+                        </label>
 
-        <div class="form-group">
-            <label for="status">الحالة</label>
+                        <input
+                            type="text"
+                            id="hearing_type"
+                            name="hearing_type"
+                            class="form-control <?= isset($errors['hearing_type']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars($values['hearing_type']) ?>"
+                        >
 
-            <select id="status" name="status">
+                        <?php if (isset($errors['hearing_type'])): ?>
 
-                <?php foreach ($statusLabels as $value => $label): ?>
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['hearing_type']) ?>
+                            </div>
 
-                    <option
-                        value="<?= htmlspecialchars($value) ?>"
-                        <?= $values['status'] === $value ? 'selected' : '' ?>
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="status"
+                            class="form-label"
+                        >
+                            الحالة
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="form-select <?= isset($errors['status']) ? 'is-invalid' : '' ?>"
+                        >
+
+                            <?php foreach ($statusLabels as $value => $label): ?>
+
+                                <option
+                                    value="<?= htmlspecialchars($value) ?>"
+                                    <?= $values['status'] === $value
+                                        ? 'selected'
+                                        : '' ?>
+                                >
+                                    <?= htmlspecialchars($label) ?>
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                        <?php if (isset($errors['status'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['status']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-0">
+
+                    <label
+                        for="notes"
+                        class="form-label"
                     >
-                        <?= htmlspecialchars($label) ?>
-                    </option>
+                        ملاحظات
+                    </label>
 
-                <?php endforeach; ?>
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        class="form-control"
+                        rows="5"
+                    ><?= htmlspecialchars($values['notes']) ?></textarea>
 
-            </select>
+                    <div class="form-hint">
+                        يمكنك تعديل أو إضافة أي ملاحظات متعلقة بالجلسة.
+                    </div>
 
-            <?php if (isset($errors['status'])): ?>
-                <small class="field-error">
-                    <?= htmlspecialchars($errors['status']) ?>
-                </small>
-            <?php endif; ?>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="form-group">
-            <label for="notes">ملاحظات</label>
+        <!-- Actions -->
+        <div class="card">
 
-            <textarea
-                id="notes"
-                name="notes"
-            ><?= htmlspecialchars($values['notes']) ?></textarea>
+            <div class="card-body">
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M5 12l5 5l10-10"></path>
+                        </svg>
+
+                        حفظ التعديلات
+
+                    </button>
+
+                    <a
+                        href="?route=cases/show&id=<?= (int) $case['id'] ?>"
+                        class="btn btn-outline-secondary"
+                    >
+                        إلغاء
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
-
-        <button type="submit" class="submit-btn">
-            حفظ التعديلات
-        </button>
 
     </form>
 
-    <a
-        class="back-link"
-        href="?route=cases/show&id=<?= (int) $case['id'] ?>"
-    >
-        ← العودة للقضية
-    </a>
-
 </div>
+
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
