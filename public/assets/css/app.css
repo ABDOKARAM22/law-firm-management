@@ -1,0 +1,637 @@
+:root {
+    --law-navy: #172033;
+    --law-navy-light: #24324a;
+    --law-gold: #b08d57;
+    --law-gold-light: #d1b27a;
+    --law-bg: #f5f6f8;
+    --law-border: #e5e7eb;
+    --law-text: #1f2937;
+    --law-muted: #6b7280;
+}
+
+
+/* =========================
+   Global
+========================= */
+
+body {
+    background: var(--law-bg);
+    color: var(--law-text);
+}
+
+
+/* =========================
+   Sidebar
+========================= */
+
+.law-sidebar {
+    position: fixed;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 270px;
+
+    background: var(--law-navy);
+
+    color: #fff;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Brand */
+
+.law-sidebar-brand {
+    padding: 24px 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.law-brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: 700;
+
+    font-size: 18px;
+}
+
+
+.law-brand:hover {
+    color: #fff;
+}
+
+
+.law-brand-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--law-gold);
+
+    color: var(--law-gold);
+
+    border-radius: 10px;
+
+    font-size: 22px;
+}
+
+
+.law-brand-text {
+    white-space: nowrap;
+}
+
+
+/* Sidebar sections */
+
+.law-sidebar-section {
+    padding: 20px 14px 0;
+}
+
+
+.law-sidebar-title {
+    color: rgba(255, 255, 255, 0.45);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+
+    padding: 0 10px;
+}
+
+
+/* Navigation */
+
+.law-nav-link {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    margin-bottom: 4px;
+
+    border-radius: 8px;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+
+.law-nav-link:hover {
+    color: #fff;
+
+    background: rgba(255, 255, 255, 0.07);
+}
+
+
+.law-nav-link.active {
+    color: #fff;
+
+    background: rgba(176, 141, 87, 0.18);
+
+    border-right: 3px solid var(--law-gold);
+}
+
+
+.law-nav-icon {
+    width: 22px;
+
+    text-align: center;
+
+    color: var(--law-gold);
+
+    font-size: 17px;
+}
+
+
+/* Sidebar User */
+
+.law-sidebar-user {
+    margin-top: auto;
+
+    padding: 16px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.law-user-avatar {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: var(--law-gold);
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-weight: 700;
+}
+
+
+.law-user-info {
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+.law-user-info strong {
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.law-user-info small {
+    color: rgba(255, 255, 255, 0.55);
+
+    margin-top: 3px;
+}
+
+
+/* =========================
+   Navbar
+========================= */
+
+.law-navbar {
+    position: fixed;
+
+    top: 0;
+    right: 270px;
+    left: 0;
+
+    height: 72px;
+
+    background: #fff;
+
+    border-bottom: 1px solid var(--law-border);
+
+    z-index: 900;
+}
+
+
+.law-navbar-content {
+    height: 100%;
+
+    padding: 0 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+.law-page-title {
+    margin: 0;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: var(--law-navy);
+}
+
+
+.law-navbar-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.law-navbar-user-name {
+    color: var(--law-text);
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.law-logout-btn {
+    border: 0;
+
+    background: transparent;
+
+    color: var(--law-muted);
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    padding: 7px 10px;
+
+    border-radius: 6px;
+}
+
+
+.law-logout-btn:hover {
+    color: #b42318;
+
+    background: #fef3f2;
+}
+
+
+/* Mobile toggle */
+
+.law-mobile-toggle {
+    display: none;
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   Main
+========================= */
+
+.law-main {
+    margin-right: 270px;
+
+    padding-top: 72px;
+
+    min-height: calc(100vh - 72px);
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+.law-footer {
+    margin-right: 270px;
+
+    background: #fff;
+
+    border-top: 1px solid var(--law-border);
+
+    padding: 18px 0;
+}
+
+
+.law-footer-content {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    color: var(--law-muted);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   Dashboard
+========================= */
+
+.law-welcome {
+    margin-bottom: 28px;
+}
+
+
+.law-welcome h2 {
+    margin-bottom: 6px;
+
+    color: var(--law-navy);
+}
+
+
+.law-welcome p {
+    color: var(--law-muted);
+
+    margin: 0;
+}
+
+
+/* Stat cards */
+
+.dashboard-stats {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 28px;
+}
+
+
+.stat-card {
+    background: #fff;
+
+    border: 1px solid var(--law-border);
+
+    border-radius: 12px;
+
+    padding: 22px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+}
+
+
+.stat-card h3 {
+    margin: 0 0 12px;
+
+    color: var(--law-muted);
+
+    font-size: 14px;
+}
+
+
+.stat-card p {
+    margin: 0;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    color: var(--law-navy);
+}
+
+
+/* Sections */
+
+.law-section {
+    margin-bottom: 28px;
+}
+
+
+.law-section-header {
+    margin-bottom: 16px;
+}
+
+
+.law-section-header h2 {
+    margin: 0;
+
+    font-size: 18px;
+
+    color: var(--law-navy);
+}
+
+
+/* Status */
+
+.case-status-list {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 14px;
+}
+
+
+.status-card {
+    background: #fff;
+
+    border: 1px solid var(--law-border);
+
+    border-radius: 10px;
+
+    padding: 18px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+
+.status-card span {
+    color: var(--law-muted);
+
+    font-size: 14px;
+}
+
+
+.status-card strong {
+    color: var(--law-navy);
+
+    font-size: 20px;
+}
+
+
+/* Appointment / Hearing */
+
+.appointments-list,
+.hearings-list {
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 16px;
+}
+
+
+.appointment-card,
+.hearing-card {
+    background: #fff;
+
+    border: 1px solid var(--law-border);
+
+    border-radius: 12px;
+
+    padding: 20px;
+}
+
+
+.appointment-card h3,
+.hearing-card h3 {
+    margin-top: 0;
+
+    color: var(--law-navy);
+
+    font-size: 16px;
+}
+
+
+.appointment-card p,
+.hearing-card p {
+    margin-bottom: 7px;
+
+    color: var(--law-muted);
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .case-status-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 991px) {
+
+    .law-sidebar {
+        right: -270px;
+
+        transition: right 0.25s ease;
+    }
+
+    .law-sidebar.show {
+        right: 0;
+    }
+
+    .law-navbar {
+        right: 0;
+    }
+
+    .law-main {
+        margin-right: 0;
+    }
+
+    .law-footer {
+        margin-right: 0;
+    }
+
+    .law-mobile-toggle {
+        display: block;
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .case-status-list {
+        grid-template-columns: 1fr;
+    }
+
+    .appointments-list,
+    .hearings-list {
+        grid-template-columns: 1fr;
+    }
+
+    .law-navbar-content {
+        padding: 0 16px;
+    }
+
+    .law-navbar-user-name {
+        display: none;
+    }
+
+    .law-footer-content {
+        flex-direction: column;
+
+        gap: 6px;
+
+        text-align: center;
+    }
+
+}

@@ -1,338 +1,629 @@
-<!DOCTYPE html>
-
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم</title>
-</head>
-
-<body>
-
 <?php
 
 use LawFirmManagement\Core\Flash;
 
+$pageTitle = 'لوحة التحكم';
+
+require __DIR__ . '/../layouts/header.php';
+
 $success = Flash::get('success');
+
+$roleLabels = [
+    'admin' => 'مدير النظام',
+    'staff' => 'موظف',
+    'lawyer' => 'محامي',
+];
+
+$roleLabel = $roleLabels[$user['role']] ?? $user['role'];
+
+$caseStatusLabels = [
+    'pending' => 'قيد الانتظار',
+    'active' => 'نشطة',
+    'on_hold' => 'موقوفة مؤقتًا',
+    'closed' => 'مغلقة',
+];
+
+$hearingStatusLabels = [
+    'scheduled' => 'مجدولة',
+    'completed' => 'مكتملة',
+    'cancelled' => 'ملغاة',
+];
+
 ?>
 
-<?php if ($success): ?>
-    <div>
-        <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
-    </div>
-<?php endif; ?>
+<div class="container-fluid">
 
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-4">
+        <div class="row align-items-center">
 
-<h1>لوحة التحكم</h1>
+            <div class="col">
 
-<p>
-    مرحبًا،
-    <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?>
-</p>
+                <div class="page-pretitle">
+                    نظام إدارة مكتب المحاماة
+                </div>
 
-<p>
-    Role:
-    <?= htmlspecialchars($user['role'], ENT_QUOTES, 'UTF-8') ?>
-</p>
+                <h2 class="page-title">
+                    لوحة التحكم
+                </h2>
 
+                <div class="text-secondary mt-1">
+                    مرحبًا، <?= htmlspecialchars(
+                        $user['name'],
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
 
-<?php if ($user['role'] === 'admin'): ?>
+                    <span class="mx-1">•</span>
 
-    <!-- Admin Statistics -->
+                    <?= htmlspecialchars(
+                        $roleLabel,
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
+                </div>
 
-    <div class="dashboard-stats">
-
-        <div class="stat-card">
-            <h3>إجمالي العملاء</h3>
-            <p><?= (int) $stats['clients_count'] ?></p>
-        </div>
-
-        <div class="stat-card">
-            <h3>إجمالي القضايا</h3>
-            <p><?= (int) $stats['cases_count'] ?></p>
-        </div>
-
-        <div class="stat-card">
-            <h3>إجمالي المحامين</h3>
-            <p><?= (int) $stats['lawyers_count'] ?></p>
-        </div>
-
-        <div class="stat-card">
-            <h3>إجمالي الموظفين</h3>
-            <p><?= (int) $stats['staff_count'] ?></p>
-        </div>
-
-    </div>
-
-
-<?php elseif ($user['role'] === 'staff'): ?>
-
-    <!-- Staff Statistics -->
-
-    <div class="dashboard-stats">
-
-        <div class="stat-card">
-            <h3>إجمالي العملاء</h3>
-            <p><?= (int) $stats['clients_count'] ?></p>
-        </div>
-
-        <div class="stat-card">
-            <h3>إجمالي القضايا</h3>
-            <p><?= (int) $stats['cases_count'] ?></p>
-        </div>
-
-    </div>
-
-
-<?php elseif ($user['role'] === 'lawyer'): ?>
-
-    <!-- Lawyer Statistics -->
-
-    <div class="dashboard-stats">
-
-        <div class="stat-card">
-            <h3>القضايا المسندة إليك</h3>
-            <p><?= (int) $stats['cases_count'] ?></p>
-        </div>
-
-    </div>
-
-<?php endif; ?>
-
-
-<?php if (in_array($user['role'], ['admin', 'staff', 'lawyer'], true)): ?>
-
-    <!-- Cases Status -->
-
-    <div class="case-status-section">
-
-        <h2>حالات القضايا</h2>
-
-        <div class="case-status-list">
-
-            <div class="status-card">
-                <span>قيد الانتظار</span>
-                <strong><?= (int) $stats['cases_by_status']['pending'] ?></strong>
-            </div>
-
-            <div class="status-card">
-                <span>نشطة</span>
-                <strong><?= (int) $stats['cases_by_status']['active'] ?></strong>
-            </div>
-
-            <div class="status-card">
-                <span>موقوفة مؤقتًا</span>
-                <strong><?= (int) $stats['cases_by_status']['on_hold'] ?></strong>
-            </div>
-
-            <div class="status-card">
-                <span>مغلقة</span>
-                <strong><?= (int) $stats['cases_by_status']['closed'] ?></strong>
             </div>
 
         </div>
-
     </div>
 
-<?php endif; ?>
+
+    <!-- Success Message -->
+    <?php if ($success): ?>
+
+        <div
+            class="alert alert-success alert-dismissible mb-4"
+            role="alert"
+        >
+
+            <div>
+                <?= htmlspecialchars(
+                    $success,
+                    ENT_QUOTES,
+                    'UTF-8'
+                ) ?>
+            </div>
+
+            <a
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="إغلاق"
+            ></a>
+
+        </div>
+
+    <?php endif; ?>
 
 
+    <!-- Statistics -->
+    <div class="row row-deck row-cards mb-4">
 
-<?php if (!empty($stats['upcoming_appointments'])): ?>
+        <?php if ($user['role'] === 'admin'): ?>
 
-    <div class="upcoming-section">
+            <!-- Clients -->
+            <div class="col-sm-6 col-lg-3">
 
-        <h2>المواعيد القادمة</h2>
+                <div class="card">
 
-        <div class="appointments-list">
+                    <div class="card-body">
 
-            <?php foreach ($stats['upcoming_appointments'] as $appointment): ?>
+                        <div class="d-flex align-items-center">
 
-                <div class="appointment-card">
+                            <div>
+                                <div class="subheader">
+                                    العملاء
+                                </div>
 
-                    <h3>
-                        <?= htmlspecialchars(
-                            $appointment['title'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </h3>
+                                <div class="h1 mb-0">
+                                    <?= (int) $stats['clients_count'] ?>
+                                </div>
+                            </div>
 
-                    <p>
-                        التاريخ:
-                        <?= htmlspecialchars(
-                            $appointment['appointment_date'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
+                        </div>
 
-                    <p>
-                        الوقت:
-                        <?= htmlspecialchars(
-                            $appointment['appointment_time'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
+                        <div class="text-secondary mt-2">
+                            إجمالي العملاء
+                        </div>
 
-                    <?php if (!empty($appointment['client_name'])): ?>
-
-                        <p>
-                            العميل:
-                            <?= htmlspecialchars(
-                                $appointment['client_name'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </p>
-
-                    <?php endif; ?>
-
-                    <?php if ($user['role'] !== 'lawyer'): ?>
-
-                        <p>
-                            المسؤول:
-                            <?= htmlspecialchars(
-                                $appointment['assigned_user_name'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </p>
-
-                    <?php endif; ?>
+                    </div>
 
                 </div>
 
-            <?php endforeach; ?>
-
-        </div>
-
-    </div>
-
-<?php endif; ?>
+            </div>
 
 
+            <!-- Cases -->
+            <div class="col-sm-6 col-lg-3">
 
+                <div class="card">
 
+                    <div class="card-body">
 
-<?php if (!empty($stats['upcoming_hearings'])): ?>
+                        <div class="subheader">
+                            القضايا
+                        </div>
 
-    <div class="upcoming-section">
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['cases_count'] ?>
+                        </div>
 
-        <h2>الجلسات القادمة</h2>
+                        <div class="text-secondary mt-2">
+                            إجمالي القضايا
+                        </div>
 
-        <div class="hearings-list">
-
-            <?php foreach ($stats['upcoming_hearings'] as $hearing): ?>
-
-                <div class="hearing-card">
-
-                    <h3>
-                        قضية:
-                        <?= htmlspecialchars(
-                            $hearing['case_number'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </h3>
-
-                    <p>
-                        العميل:
-                        <?= htmlspecialchars(
-                            $hearing['client_name'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
-
-                    <p>
-                        التاريخ:
-                        <?= htmlspecialchars(
-                            $hearing['hearing_date'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
-
-                    <p>
-                        الوقت:
-                        <?= htmlspecialchars(
-                            $hearing['hearing_time'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
-
-                    <p>
-                        المحكمة:
-                        <?= htmlspecialchars(
-                            $hearing['court_name'],
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
-                    </p>
-
-                    <?php if (!empty($hearing['court_number'])): ?>
-
-                        <p>
-                            الدائرة:
-                            <?= htmlspecialchars(
-                                $hearing['court_number'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </p>
-
-                    <?php endif; ?>
-
-
-                        <p>
-                            الحالة:
-                            <?php
-                            $hearingStatusLabels = [
-                                'scheduled' => 'مجدولة',
-                                'completed' => 'مكتملة',
-                                'cancelled' => 'ملغاة',
-                            ];
-                            ?>
-
-                            <?= htmlspecialchars(
-                                $hearingStatusLabels[$hearing['status']] ?? $hearing['status'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </p>
+                    </div>
 
                 </div>
 
-            <?php endforeach; ?>
+            </div>
+
+
+            <!-- Lawyers -->
+            <div class="col-sm-6 col-lg-3">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="subheader">
+                            المحامون
+                        </div>
+
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['lawyers_count'] ?>
+                        </div>
+
+                        <div class="text-secondary mt-2">
+                            إجمالي المحامين
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Staff -->
+            <div class="col-sm-6 col-lg-3">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="subheader">
+                            الموظفون
+                        </div>
+
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['staff_count'] ?>
+                        </div>
+
+                        <div class="text-secondary mt-2">
+                            إجمالي الموظفين
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        <?php elseif ($user['role'] === 'staff'): ?>
+
+            <!-- Clients -->
+            <div class="col-sm-6 col-lg-3">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="subheader">
+                            العملاء
+                        </div>
+
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['clients_count'] ?>
+                        </div>
+
+                        <div class="text-secondary mt-2">
+                            إجمالي العملاء
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Cases -->
+            <div class="col-sm-6 col-lg-3">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="subheader">
+                            القضايا
+                        </div>
+
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['cases_count'] ?>
+                        </div>
+
+                        <div class="text-secondary mt-2">
+                            إجمالي القضايا
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        <?php elseif ($user['role'] === 'lawyer'): ?>
+
+            <!-- Assigned Cases -->
+            <div class="col-sm-6 col-lg-3">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="subheader">
+                            القضايا المسندة
+                        </div>
+
+                        <div class="h1 mb-0">
+                            <?= (int) $stats['cases_count'] ?>
+                        </div>
+
+                        <div class="text-secondary mt-2">
+                            القضايا المسندة إليك
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+
+    <!-- Case Status -->
+    <div class="row row-deck row-cards mb-4">
+
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        حالات القضايا
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <?php foreach ($caseStatusLabels as $status => $label): ?>
+
+                            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+
+                                <div class="d-flex align-items-center">
+
+                                    <div>
+
+                                        <div class="text-secondary">
+                                            <?= htmlspecialchars(
+                                                $label,
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+                                        </div>
+
+                                        <div class="h2 mb-0">
+
+                                            <?= (int) (
+                                                $stats['cases_by_status'][$status] ?? 0
+                                            ) ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
-<?php endif; ?>
+
+    <!-- Upcoming Events -->
+    <div class="row row-deck row-cards">
+
+        <!-- Appointments -->
+        <div class="col-lg-6">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        المواعيد القادمة
+                    </h3>
+
+                    <div class="card-actions">
+
+                        <a href="?route=appointments">
+                            عرض الكل
+                        </a>
+
+                    </div>
+
+                </div>
 
 
+                <?php if (!empty($stats['upcoming_appointments'])): ?>
 
-<form method="POST" action="?route=logout">
+                    <div class="list-group list-group-flush">
 
-    <input
-        type="hidden"
-        name="_token"
-        value="<?= htmlspecialchars(
-            \LawFirmManagement\Core\Csrf::token(),
-            ENT_QUOTES,
-            'UTF-8'
-        ) ?>"
-    >
+                        <?php foreach (
+                            $stats['upcoming_appointments']
+                            as $appointment
+                        ): ?>
 
-    <button type="submit">
-        تسجيل الخروج
-    </button>
+                            <div class="list-group-item">
 
-</form>
+                                <div class="d-flex justify-content-between">
 
-</body>
-</html>
+                                    <div>
+
+                                        <div class="fw-bold">
+
+                                            <?= htmlspecialchars(
+                                                $appointment['title'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                        <?php if (
+                                            !empty($appointment['client_name'])
+                                        ): ?>
+
+                                            <div class="text-secondary small mt-1">
+
+                                                العميل:
+                                                <?= htmlspecialchars(
+                                                    $appointment['client_name'],
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                ) ?>
+
+                                            </div>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                    <div class="text-end">
+
+                                        <div class="fw-bold">
+
+                                            <?= htmlspecialchars(
+                                                $appointment['appointment_date'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                        <div class="text-secondary small">
+
+                                            <?= htmlspecialchars(
+                                                $appointment['appointment_time'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="card-body">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">
+                                📅
+                            </div>
+
+                            <p class="empty-title">
+                                لا توجد مواعيد قادمة
+                            </p>
+
+                            <p class="empty-subtitle text-secondary">
+                                لا توجد مواعيد مجدولة حاليًا.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+
+        <!-- Hearings -->
+        <div class="col-lg-6">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        الجلسات القادمة
+                    </h3>
+
+                    <div class="card-actions">
+
+                        <a href="?route=cases">
+                            عرض القضايا
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <?php if (!empty($stats['upcoming_hearings'])): ?>
+
+                    <div class="list-group list-group-flush">
+
+                        <?php foreach (
+                            $stats['upcoming_hearings']
+                            as $hearing
+                        ): ?>
+
+                            <div class="list-group-item">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <div>
+
+                                        <div class="fw-bold">
+
+                                            قضية
+                                            <?= htmlspecialchars(
+                                                $hearing['case_number'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                        <div class="text-secondary small mt-1">
+
+                                            العميل:
+                                            <?= htmlspecialchars(
+                                                $hearing['client_name'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                        <div class="text-secondary small mt-1">
+
+                                            المحكمة:
+                                            <?= htmlspecialchars(
+                                                $hearing['court_name'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="text-end">
+
+                                        <div class="fw-bold">
+
+                                            <?= htmlspecialchars(
+                                                $hearing['hearing_date'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                        <div class="text-secondary small">
+
+                                            <?= htmlspecialchars(
+                                                $hearing['hearing_time'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        <?php endforeach; ?>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="card-body">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">
+                                ⚖️
+                            </div>
+
+                            <p class="empty-title">
+                                لا توجد جلسات قادمة
+                            </p>
+
+                            <p class="empty-subtitle text-secondary">
+                                لا توجد جلسات مجدولة حاليًا.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
