@@ -17,6 +17,21 @@ $hearingStatusLabels = [
     'cancelled' => 'ملغاة',
 ];
 
+$statusBadgeClasses = [
+    'pending' => 'bg-yellow-lt text-yellow',
+    'active' => 'bg-green-lt text-green',
+    'on_hold' => 'bg-orange-lt text-orange',
+    'closed' => 'bg-blue-lt text-blue',
+    'cancelled' => 'bg-red-lt text-red',
+];
+
+$hearingStatusBadgeClasses = [
+    'scheduled' => 'bg-blue-lt text-blue',
+    'completed' => 'bg-green-lt text-green',
+    'postponed' => 'bg-yellow-lt text-yellow',
+    'cancelled' => 'bg-red-lt text-red',
+];
+
 $oldStatusLabel = static function (?string $status) use ($statusLabels): string {
     if ($status === null || $status === '') {
         return '—';
@@ -25,597 +40,829 @@ $oldStatusLabel = static function (?string $status) use ($statusLabels): string 
     return $statusLabels[$status] ?? $status;
 };
 
+$pageTitle = 'تفاصيل القضية';
+
 ?>
 
-<!DOCTYPE html>
+<?php require __DIR__ . '/../layouts/header.php'; ?>
 
-<html lang="ar" dir="rtl">
+<div class="container-xl">
 
-<head>
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-4">
 
-    <meta charset="UTF-8">
+        <div class="row align-items-center">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <div class="col">
 
-    <title>تفاصيل القضية</title>
+                <div class="page-pretitle">
+                    إدارة القضايا
+                </div>
 
-    <style>
+                <h2 class="page-title">
+                    تفاصيل القضية
+                </h2>
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background: #f5f5f5;
-        }
+            </div>
 
-        .container {
-            max-width: 1200px;
-            margin: auto;
-        }
+            <div class="col-auto ms-auto">
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+                <div class="btn-list">
 
-        a {
-            text-decoration: none;
-        }
+                    <a
+                        href="?route=cases"
+                        class="btn btn-outline-secondary"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M9 6l6 6l-6 6"></path>
+                        </svg>
 
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #333;
-            color: white;
-            border-radius: 5px;
-        }
+                        العودة إلى القضايا
+                    </a>
 
-        .edit-btn {
-            display: inline-block;
-            padding: 7px 12px;
-            background: #007bff;
-            color: white;
-            border-radius: 5px;
-        }
+                </div>
 
-        .success {
-            padding: 10px;
-            background: #d4edda;
-            color: #155724;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
+            </div>
 
-        .section {
-            margin-bottom: 30px;
-        }
-
-        .section h2 {
-            margin-bottom: 15px;
-        }
-
-        .case-info,
-        .history,
-        .hearings {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        .case-info th,
-        .case-info td,
-        .history th,
-        .history td,
-        .hearings th,
-        .hearings td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-
-        .case-info th,
-        .history th,
-        .hearings th {
-            background: #eee;
-        }
-
-        .case-info th {
-            width: 200px;
-        }
-
-        .description {
-            line-height: 1.8;
-            white-space: normal;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 30px;
-            background: white;
-            border: 1px solid #ddd;
-        }
-
-        .actions {
-            margin-top: 20px;
-        }
-
-        .actions a {
-            margin-left: 10px;
-        }
-
-        .status-change {
-            font-weight: bold;
-        }
-
-        .hearing-status {
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-
-            body {
-                margin: 20px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .case-info th {
-                width: 120px;
-            }
-
-            .history,
-            .hearings {
-                font-size: 14px;
-            }
-
-            .history th,
-            .history td,
-            .hearings th,
-            .hearings td {
-                padding: 8px;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-
-    <!-- Header -->
-
-    <div class="header">
-
-        <h1>تفاصيل القضية</h1>
-
-        <a href="?route=cases" class="btn">
-            العودة إلى القضايا
-        </a>
+        </div>
 
     </div>
 
 
-    <!-- Success Message -->
+    <!-- Case Summary -->
+    <div class="row row-cards mb-4">
 
-    <?php if ($message = Flash::get('success')): ?>
+        <div class="col-lg-8">
 
-        <div class="success">
+            <div class="card h-100">
 
-            <?= htmlspecialchars(
-                $message,
-                ENT_QUOTES,
-                'UTF-8'
-            ) ?>
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        معلومات القضية
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <!-- Case Number -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                رقم القضية
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['case_number'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Case Title -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                عنوان القضية
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['title'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Client -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                العميل
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['client_name'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Lawyer -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                المحامي المسؤول
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['lawyer_name'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Case Type -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                نوع القضية
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['case_type_name'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+
+                        <!-- Filing Date -->
+                        <div class="col-md-6">
+
+                            <div class="text-secondary small mb-1">
+                                تاريخ القيد
+                            </div>
+
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['filing_date'] ?? '—',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-    <?php endif; ?>
+
+        <!-- Status & Court -->
+        <div class="col-lg-4">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+
+                    <h3 class="card-title">
+                        حالة القضية
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-4">
+
+                        <div class="text-secondary small mb-2">
+                            الحالة الحالية
+                        </div>
+
+                        <span
+                            class="badge <?= $statusBadgeClasses[$case['status']] ?? 'bg-secondary-lt text-secondary' ?>"
+                        >
+                            <?= htmlspecialchars(
+                                $statusLabels[$case['status']]
+                                    ?? $case['status'],
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
+                        </span>
+
+                    </div>
 
 
-    <!-- Case Information -->
+                    <div class="row g-4">
 
-    <section class="section">
+                        <!-- Court -->
+                        <div class="col-12">
 
-        <h2>معلومات القضية</h2>
+                            <div class="text-secondary small mb-1">
+                                المحكمة
+                            </div>
 
-        <table class="case-info">
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['court_name'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
 
-            <tr>
+                        </div>
 
-                <th>رقم القضية</th>
 
-                <td>
-                    <?= htmlspecialchars(
-                        $case['case_number'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
+                        <!-- Court Number -->
+                        <div class="col-12">
 
-            </tr>
+                            <div class="text-secondary small mb-1">
+                                رقم الدائرة
+                            </div>
 
-            <tr>
+                            <div class="fw-semibold">
+                                <?= htmlspecialchars(
+                                    $case['court_number'] ?? '—',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </div>
 
-                <th>عنوان القضية</th>
+                        </div>
 
-                <td>
-                    <?= htmlspecialchars(
-                        $case['title'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
+                    </div>
 
-            </tr>
+                </div>
 
-            <tr>
+            </div>
 
-                <th>العميل</th>
+        </div>
 
-                <td>
-                    <?= htmlspecialchars(
-                        $case['client_name'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
+    </div>
 
-            </tr>
 
-            <tr>
+    <!-- Description -->
+    <div class="card mb-4">
 
-                <th>المحامي</th>
+        <div class="card-header">
 
-                <td>
-                    <?= htmlspecialchars(
-                        $case['lawyer_name'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
+            <h3 class="card-title">
+                وصف القضية
+            </h3>
 
-            </tr>
+        </div>
 
-            <tr>
+        <div class="card-body">
 
-                <th>نوع القضية</th>
+            <?php if (!empty($case['description'])): ?>
 
-                <td>
-                    <?= htmlspecialchars(
-                        $case['case_type_name'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <th>المحكمة</th>
-
-                <td>
-                    <?= htmlspecialchars(
-                        $case['court_name'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <th>رقم الدائرة</th>
-
-                <td>
-                    <?= htmlspecialchars(
-                        $case['court_number'] ?? '—',
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <th>الحالة</th>
-
-                <td>
-                    <?= htmlspecialchars(
-                        $statusLabels[$case['status']]
-                            ?? $case['status'],
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <th>تاريخ القيد</th>
-
-                <td>
-                    <?= htmlspecialchars(
-                        $case['filing_date'] ?? '—',
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </td>
-
-            </tr>
-
-            <tr>
-
-                <th>الوصف</th>
-
-                <td class="description">
-
+                <div class="text-secondary lh-lg">
                     <?= nl2br(
                         htmlspecialchars(
-                            $case['description'] ?? '—',
+                            $case['description'],
                             ENT_QUOTES,
                             'UTF-8'
                         )
                     ) ?>
+                </div>
 
-                </td>
+            <?php else: ?>
 
-            </tr>
+                <div class="empty">
 
-        </table>
+                    <div class="empty-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2"></path>
+                        </svg>
+                    </div>
 
-    </section>
+                    <p class="empty-title">
+                        لا يوجد وصف للقضية
+                    </p>
+
+                    <p class="empty-subtitle text-secondary">
+                        لم تتم إضافة وصف لهذه القضية حتى الآن.
+                    </p>
+
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+
+    </div>
 
 
     <!-- Status History -->
+    <div class="card mb-4">
 
-    <section class="section">
+        <div class="card-header">
 
-        <h2>سجل حالات القضية</h2>
+            <h3 class="card-title">
+                سجل حالات القضية
+            </h3>
+
+        </div>
 
         <?php if (empty($statusHistory)): ?>
 
-            <div class="empty">
-                لا يوجد سجل لحالات القضية.
+            <div class="card-body">
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M12 8v4l2 2"></path>
+                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                        </svg>
+                    </div>
+
+                    <p class="empty-title">
+                        لا يوجد سجل لحالات القضية
+                    </p>
+
+                    <p class="empty-subtitle text-secondary">
+                        لم يتم تسجيل أي تغييرات على حالة القضية حتى الآن.
+                    </p>
+
+                </div>
+
             </div>
 
         <?php else: ?>
 
-            <table class="history">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table table-vcenter card-table">
 
-                    <tr>
-                        <th>الحالة السابقة</th>
-                        <th>الحالة الجديدة</th>
-                        <th>بواسطة</th>
-                        <th>التاريخ</th>
-                    </tr>
+                    <thead>
 
-                </thead>
+                        <tr>
+                            <th>الحالة السابقة</th>
+                            <th>الحالة الجديدة</th>
+                            <th>بواسطة</th>
+                            <th>التاريخ</th>
+                        </tr>
 
-                <tbody>
+                    </thead>
 
-                <?php foreach ($statusHistory as $history): ?>
+                    <tbody>
 
-                    <tr>
+                    <?php foreach ($statusHistory as $history): ?>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $oldStatusLabel(
-                                    $history['old_status'] ?? null
-                                ),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                        <tr>
 
-                        <td class="status-change">
-                            <?= htmlspecialchars(
-                                $oldStatusLabel(
-                                    $history['new_status'] ?? null
-                                ),
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                            <td>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $history['changed_by_name'] ?? '—',
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                                <?php
+                                $oldStatus = $history['old_status'] ?? null;
+                                ?>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $history['changed_at'] ?? '—',
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                                <?php if ($oldStatus === null || $oldStatus === ''): ?>
 
-                    </tr>
+                                    <span class="text-secondary">
+                                        —
+                                    </span>
 
-                <?php endforeach; ?>
+                                <?php else: ?>
 
-                </tbody>
+                                    <span
+                                        class="badge <?= $statusBadgeClasses[$oldStatus] ?? 'bg-secondary-lt text-secondary' ?>"
+                                    >
+                                        <?= htmlspecialchars(
+                                            $oldStatusLabel($oldStatus),
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>
+                                    </span>
 
-            </table>
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <?php
+                                $newStatus = $history['new_status'] ?? null;
+                                ?>
+
+                                <?php if ($newStatus === null || $newStatus === ''): ?>
+
+                                    <span class="text-secondary">
+                                        —
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span
+                                        class="badge <?= $statusBadgeClasses[$newStatus] ?? 'bg-secondary-lt text-secondary' ?>"
+                                    >
+                                        <?= htmlspecialchars(
+                                            $oldStatusLabel($newStatus),
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
+
+                            <td>
+
+                                <?= htmlspecialchars(
+                                    $history['changed_by_name'] ?? '—',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+
+                            </td>
+
+
+                            <td class="text-secondary">
+
+                                <?= htmlspecialchars(
+                                    $history['changed_at'] ?? '—',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         <?php endif; ?>
 
-    </section>
+    </div>
 
 
     <!-- Hearings -->
+    <div class="card mb-4">
 
-    <section class="section">
+        <div class="card-header">
 
-        <h2>جلسات القضية</h2>
+            <div class="row align-items-center w-100">
 
-    <a href="?route=hearings/create&case_id=<?= (int) $case['id'] ?>" class="edit-btn">
-        إضافة جلسة
-    </a>
+                <div class="col">
+
+                    <h3 class="card-title mb-1">
+                        جلسات القضية
+                    </h3>
+
+                    <div class="text-secondary small">
+                        <?= count($hearings) ?>
+                        <?= count($hearings) === 1 ? 'جلسة' : 'جلسات' ?>
+                    </div>
+
+                </div>
+
+                <div class="col-auto">
+
+                    <a
+                        href="?route=hearings/create&case_id=<?= (int) $case['id'] ?>"
+                        class="btn btn-primary"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M12 5l0 14"></path>
+                            <path d="M5 12l14 0"></path>
+                        </svg>
+
+                        إضافة جلسة
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
 
         <?php if (empty($hearings)): ?>
 
-            <div class="empty">
-                لا توجد جلسات لهذه القضية.
+            <div class="card-body">
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M12 8v4l2 2"></path>
+                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                        </svg>
+                    </div>
+
+                    <p class="empty-title">
+                        لا توجد جلسات لهذه القضية
+                    </p>
+
+                    <p class="empty-subtitle text-secondary">
+                        لم تتم إضافة أي جلسات لهذه القضية حتى الآن.
+                    </p>
+
+                </div>
+
             </div>
 
         <?php else: ?>
 
-            <table class="hearings">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table table-vcenter card-table">
 
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>الوقت</th>
-                        <th>المحكمة</th>
-                        <th>رقم الدائرة</th>
-                        <th>نوع الجلسة</th>
-                        <th>الحالة</th>
-                        <th>الملاحظات</th>
-                        <th>تعديل</th>
-                    </tr>
+                    <thead>
 
-                </thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الوقت</th>
+                            <th>المحكمة</th>
+                            <th>رقم الدائرة</th>
+                            <th>نوع الجلسة</th>
+                            <th>الحالة</th>
+                            <th>الملاحظات</th>
+                            <th class="w-1">إجراء</th>
+                        </tr>
 
-                <tbody>
+                    </thead>
 
-                <?php foreach ($hearings as $hearing): ?>
+                    <tbody>
 
-                    <tr>
+                    <?php foreach ($hearings as $hearing): ?>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $hearing['hearing_date'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                        <tr>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $hearing['hearing_time'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                            <td>
+                                <?= htmlspecialchars(
+                                    $hearing['hearing_date'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </td>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $hearing['court_name'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $hearing['court_number'] ?? '—',
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
+                            <td>
+                                <?= htmlspecialchars(
+                                    $hearing['hearing_time'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </td>
 
-                        <td>
-                            <?= htmlspecialchars(
-                                $hearing['hearing_type'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </td>
 
-                        <td class="hearing-status">
+                            <td>
+                                <?= htmlspecialchars(
+                                    $hearing['court_name'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </td>
 
-                            <?= htmlspecialchars(
-                                $hearingStatusLabels[
-                                    $hearing['status']
-                                ] ?? $hearing['status'],
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
 
-                        </td>
+                            <td>
+                                <?= htmlspecialchars(
+                                    $hearing['court_number'] ?? '—',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </td>
 
-                        <td>
 
-                            <?php if (!empty($hearing['notes'])): ?>
+                            <td>
+                                <?= htmlspecialchars(
+                                    $hearing['hearing_type'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </td>
 
-                                <?= nl2br(
-                                    htmlspecialchars(
-                                        $hearing['notes'],
+
+                            <td>
+
+                                <span
+                                    class="badge <?= $hearingStatusBadgeClasses[$hearing['status']] ?? 'bg-secondary-lt text-secondary' ?>"
+                                >
+                                    <?= htmlspecialchars(
+                                        $hearingStatusLabels[
+                                            $hearing['status']
+                                        ] ?? $hearing['status'],
                                         ENT_QUOTES,
                                         'UTF-8'
-                                    )
-                                ) ?>
+                                    ) ?>
+                                </span>
 
-                            <?php else: ?>
+                            </td>
 
-                                —
 
-                            <?php endif; ?>
+                            <td>
 
-                        </td>
+                                <?php if (!empty($hearing['notes'])): ?>
 
-                        <td>
-                            <a href="?route=hearings/edit&id=<?= (int) $hearing['id'] ?>"  class="edit-btn" >
-                                تعديل           
-                            </a>
-                        </td>
+                                    <div class="text-secondary">
+                                        <?= nl2br(
+                                            htmlspecialchars(
+                                                $hearing['notes'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            )
+                                        ) ?>
+                                    </div>
 
-                    </tr>
+                                <?php else: ?>
 
-                <?php endforeach; ?>
+                                    <span class="text-secondary">
+                                        —
+                                    </span>
 
-                </tbody>
+                                <?php endif; ?>
 
-            </table>
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="?route=hearings/edit&id=<?= (int) $hearing['id'] ?>"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="icon icon-sm"
+                                    >
+                                        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+                                        <path d="M13.5 6.5l4 4"></path>
+                                    </svg>
+
+                                    تعديل
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         <?php endif; ?>
 
-    </section>
+    </div>
 
 
-    <!-- Actions -->
+    <!-- Bottom Actions -->
+    <div class="d-print-none mb-4">
 
-    <section class="actions">
+        <div class="card">
 
-        <a
-            href="?route=cases/documents&id=<?= (int) $case['id'] ?>"
-            class="edit-btn"
-        >
-            مستندات القضية
-        </a>
+            <div class="card-body">
 
-        <a
-            href="?route=cases"
-            class="btn"
-        >
-            العودة إلى القضايا
-        </a>
+                <div class="btn-list">
 
-    </section>
+                    <a
+                        href="?route=cases/documents&id=<?= (int) $case['id'] ?>"
+                        class="btn btn-primary"
+                    >
 
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1v-14a1 1 0 0 1 1 -1"></path>
+                            <path d="M9 8h6"></path>
+                            <path d="M9 12h6"></path>
+                            <path d="M9 16h4"></path>
+                        </svg>
+
+                        مستندات القضية
+
+                    </a>
+
+
+                    <a
+                        href="?route=cases"
+                        class="btn btn-outline-secondary"
+                    >
+
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M9 6l6 6l-6 6"></path>
+                        </svg>
+
+                        العودة إلى القضايا
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
-</body>
-
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
