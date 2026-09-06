@@ -18,4 +18,9 @@ class AuthMiddleware
             exit;
         }
     }
+
+    public function isAuthenticated(): bool
+    {
+        return $this->auth->check();
+    }
 }

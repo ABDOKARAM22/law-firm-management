@@ -1,6 +1,16 @@
 <?php
 
+use LawFirmManagement\Core\Auth;
+
 $pageTitle = $pageTitle ?? 'مكتب المحاماة';
+
+$auth = $GLOBALS['auth'] ?? null;
+
+$user = $auth instanceof Auth
+    ? $auth->user()
+    : null;
+
+
 
 ?>
 
@@ -17,7 +27,7 @@ $pageTitle = $pageTitle ?? 'مكتب المحاماة';
     >
 
     <title>
-        <?= htmlspecialchars($pageTitle) ?> | مكتب المحاماة
+        <?= htmlspecialchars($pageTitle) ?> | نظام إدارة مكتب محاماة
     </title>
 
     <!-- Tabler RTL -->

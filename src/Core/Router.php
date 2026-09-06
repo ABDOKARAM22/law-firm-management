@@ -35,11 +35,24 @@ class Router
 
         switch ($route) {
 
+
+            case '':
+                if ($this->authMiddleware->isAuthenticated()) {
+                    header('Location: ?route=dashboard');
+                } else {
+                    header('Location: ?route=login');
+                }
+
+            exit;
+
             case 'login':
 
                 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $this->authController->login();
-                } else {
+                } elseif($this->authMiddleware->isAuthenticated()) {
+                    header('Location: ?route=dashboard');
+                    exit;
+                }else{
                     $this->authController->showLogin();
                 }
 

@@ -53,9 +53,9 @@ $success = Flash::get('success');
                 class="navbar-brand navbar-brand-autodark"
             >
 
-                <span class="law-brand-icon">
+                <!-- <span class="law-brand-icon">
                     ⚖️
-                </span>
+                </span> -->
 
                 <span class="fw-bold">
                     مكتب المحاماة

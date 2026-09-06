@@ -69,6 +69,8 @@ class Application
         // Authentication
         $auth = new Auth($userRepository);
 
+        // Make Auth available to the shared layout
+        $GLOBALS['auth'] = $auth;
 
         
         $caseAccessService = new CaseAccessService(
