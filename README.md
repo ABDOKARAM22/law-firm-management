@@ -4,6 +4,21 @@ A backend-focused Law Firm Management System built with **Core PHP, OOP, MySQL, 
 
 The system manages **clients, cases, hearings, appointments, documents, and users**, with role-based access control and secure backend operations.
 
+
+## Live Demo
+
+🔗 https://lawfirmmanagement.freedev.app/
+
+### Demo Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `demo.admin@lawfirm.test` | `Admin@123` |
+| Lawyer | `demo.lawyer@lawfirm.test` | `Lawyer@123` |
+| Staff | `demo.staff@lawfirm.test` | `Staff@123` |
+
+> These accounts are provided for demonstration purposes only.  
+> No real client or case data is used.
 ---
 
 ## Key Features
@@ -139,7 +154,6 @@ Configure Apache to serve the project's `public/` directory.
 
 ## Future Improvements
 
-- Production Deployment
 - Expanded Automated Testing
 - Advanced Reports & Dashboard Statistics
 - Standalone Hearings Overview & Filtering
