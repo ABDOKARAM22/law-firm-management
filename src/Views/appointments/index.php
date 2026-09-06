@@ -1,7 +1,6 @@
 <?php
 
 use LawFirmManagement\Core\Flash;
-use LawFirmManagement\Core\Csrf;
 
 $success = Flash::get('success');
 
@@ -13,282 +12,313 @@ $statusLabels = [
 
 ?>
 
-<!DOCTYPE html>
+<?php require __DIR__ . '/../layouts/header.php'; ?>
 
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="page-wrapper">
 
-    <title>المواعيد</title>
+    <div class="container-xl py-4">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+        <!-- Page Header -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
 
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #f5f7fa;
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
+            <div>
+                <h2 class="page-title mb-1">
+                    المواعيد
+                </h2>
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+                <p class="text-secondary mb-0">
+                    إدارة ومتابعة مواعيد المكتب
+                </p>
+            </div>
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+            <div>
+                <a
+                    href="?route=appointments/create"
+                    class="btn btn-primary"
+                >
+                    <i class="ti ti-plus me-1"></i>
+                    إضافة موعد
+                </a>
+            </div>
 
-        h1 {
-            margin: 0;
-            color: #1f2937;
-            font-size: 28px;
-        }
-
-        .add-btn {
-            display: inline-block;
-            padding: 10px 18px;
-            background-color: #2563eb;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: background-color 0.2s;
-        }
-
-        .add-btn:hover {
-            background-color: #1d4ed8;
-        }
-
-        .success {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #15803d;
-            padding: 13px 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
-
-        th,
-        td {
-            padding: 13px 12px;
-            text-align: right;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        th {
-            background-color: #f9fafb;
-            color: #374151;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-
-        tbody tr:hover {
-            background-color: #f9fafb;
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .status-scheduled {
-            background-color: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .status-completed {
-            background-color: #dcfce7;
-            color: #15803d;
-        }
-
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .edit-btn {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .edit-btn:hover {
-            text-decoration: underline;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 30px;
-            color: #6b7280;
-        }
-
-        @media (max-width: 700px) {
-            body {
-                padding: 20px 10px;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .add-btn {
-                text-align: center;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <div class="header">
-        <h1>المواعيد</h1>
-
-        <a
-            href="?route=appointments/create"
-            class="add-btn"
-        >
-            + إضافة موعد
-        </a>
-    </div>
-
-
-    <?php if ($success): ?>
-
-        <div class="success">
-            <?= htmlspecialchars($success) ?>
         </div>
 
-    <?php endif; ?>
+
+        <!-- Success Message -->
+        <?php if ($success): ?>
+
+            <div
+                class="alert alert-success alert-dismissible mb-4"
+                role="alert"
+            >
+                <div class="d-flex">
+
+                    <i class="ti ti-check me-2"></i>
+
+                    <div>
+                        <?= htmlspecialchars($success) ?>
+                    </div>
+
+                </div>
+
+                <a
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="close"
+                ></a>
+            </div>
+
+        <?php endif; ?>
 
 
-    <div class="table-wrapper">
+        <!-- Appointments Card -->
+        <div class="card">
 
-        <table>
+            <div class="card-header">
 
-            <thead>
-                <tr>
-                    <th>العميل</th>
-                    <th>المسؤول</th>
-                    <th>التاريخ</th>
-                    <th>الوقت</th>
-                    <th>العنوان</th>
-                    <th>النوع</th>
-                    <th>الحالة</th>
-                    <th>الإجراءات</th>
-                </tr>
-            </thead>
+                <div class="d-flex align-items-center">
 
-            <tbody>
+                    <span class="avatar avatar-sm bg-primary-lt me-2">
+                        <i class="ti ti-calendar-event"></i>
+                    </span>
 
-            <?php if (empty($appointments)): ?>
+                    <div>
+                        <h3 class="card-title mb-0">
+                            قائمة المواعيد
+                        </h3>
 
-                <tr>
-                    <td colspan="8" class="empty">
-                        لا توجد مواعيد.
-                    </td>
-                </tr>
+                        <div class="text-secondary small">
+                            جميع المواعيد المسجلة في النظام
+                        </div>
+                    </div>
 
-            <?php else: ?>
+                </div>
 
-                <?php foreach ($appointments as $appointment): ?>
+            </div>
 
-                    <tr>
 
-                        <td>
-                            <?= $appointment['client_name']
-                                ? htmlspecialchars($appointment['client_name'])
-                                : 'بدون عميل' ?>
-                        </td>
+            <div class="card-body p-0">
 
-                        <td>
-                            <?= htmlspecialchars($appointment['assigned_user_name']) ?>
-                        </td>
+                <?php if (empty($appointments)): ?>
 
-                        <td>
-                            <?= htmlspecialchars($appointment['appointment_date']) ?>
-                        </td>
+                    <!-- Empty State -->
+                    <div class="empty py-5">
 
-                        <td>
-                            <?= htmlspecialchars($appointment['appointment_time']) ?>
-                        </td>
+                        <div class="empty-icon">
+                            <i class="ti ti-calendar-off"></i>
+                        </div>
 
-                        <td>
-                            <?= htmlspecialchars($appointment['title']) ?>
-                        </td>
+                        <p class="empty-title">
+                            لا توجد مواعيد
+                        </p>
 
-                        <td>
-                            <?= htmlspecialchars($appointment['type']) ?>
-                        </td>
+                        <p class="empty-subtitle text-secondary">
+                            لم يتم تسجيل أي مواعيد حتى الآن.
+                        </p>
 
-                        <td>
-                            <?php
-                            $status = $appointment['status'];
-                            $statusLabel = $statusLabels[$status] ?? $status;
-                            ?>
+                        <div class="empty-action">
 
-                            <span class="status status-<?= htmlspecialchars($status) ?>">
-                                <?= htmlspecialchars($statusLabel) ?>
-                            </span>
-                        </td>
-
-                        <td>
                             <a
-                                href="?route=appointments/edit&id=<?= (int) $appointment['id'] ?>"
-                                class="edit-btn"
+                                href="?route=appointments/create"
+                                class="btn btn-primary"
                             >
-                                تعديل
+                                <i class="ti ti-plus me-1"></i>
+                                إضافة موعد
                             </a>
-                        </td>
 
-                    </tr>
+                        </div>
 
-                <?php endforeach; ?>
+                    </div>
 
-            <?php endif; ?>
+                <?php else: ?>
 
-            </tbody>
+                    <div class="table-responsive">
 
-        </table>
+                        <table class="table table-vcenter card-table">
+
+                            <thead>
+                                <tr>
+
+                                    <th>العميل</th>
+
+                                    <th>المسؤول</th>
+
+                                    <th>التاريخ</th>
+
+                                    <th>الوقت</th>
+
+                                    <th>العنوان</th>
+
+                                    <th>النوع</th>
+
+                                    <th>الحالة</th>
+
+                                    <th class="text-center">
+                                        الإجراءات
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+
+                            <?php foreach ($appointments as $appointment): ?>
+
+                                <tr>
+
+                                    <!-- Client -->
+                                    <td>
+
+                                        <div class="d-flex align-items-center">
+
+                                            <span class="avatar avatar-sm bg-secondary-lt me-2">
+                                                <i class="ti ti-user"></i>
+                                            </span>
+
+                                            <div>
+
+                                                <?=
+                                                    $appointment['client_name']
+                                                        ? htmlspecialchars($appointment['client_name'])
+                                                        : 'بدون عميل'
+                                                ?>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Assigned User -->
+                                    <td>
+
+                                        <div class="d-flex align-items-center">
+
+                                            <span class="avatar avatar-sm bg-blue-lt me-2">
+                                                <i class="ti ti-user-check"></i>
+                                            </span>
+
+                                            <span>
+                                                <?= htmlspecialchars($appointment['assigned_user_name']) ?>
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Date -->
+                                    <td>
+
+                                        <div class="d-flex align-items-center text-secondary">
+
+                                            <i class="ti ti-calendar me-2"></i>
+
+                                            <span>
+                                                <?= htmlspecialchars($appointment['appointment_date']) ?>
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Time -->
+                                    <td>
+
+                                        <div class="d-flex align-items-center text-secondary">
+
+                                            <i class="ti ti-clock me-2"></i>
+
+                                            <span>
+                                                <?= htmlspecialchars($appointment['appointment_time']) ?>
+                                            </span>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Title -->
+                                    <td>
+
+                                        <div class="fw-semibold">
+                                            <?= htmlspecialchars($appointment['title']) ?>
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- Type -->
+                                    <td>
+
+                                        <span class="text-secondary">
+                                            <?= htmlspecialchars($appointment['type']) ?>
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Status -->
+                                    <td>
+
+                                        <?php
+
+                                        $status = $appointment['status'];
+
+                                        $statusLabel = $statusLabels[$status] ?? $status;
+
+                                        $statusClass = match ($status) {
+                                            'scheduled' => 'bg-blue-lt text-blue',
+                                            'completed' => 'bg-green-lt text-green',
+                                            'cancelled' => 'bg-red-lt text-red',
+                                            default => 'bg-secondary-lt text-secondary',
+                                        };
+
+                                        ?>
+
+                                        <span class="badge <?= $statusClass ?>">
+
+                                            <?= htmlspecialchars($statusLabel) ?>
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+                                    <td class="text-center">
+
+                                        <a
+                                            href="?route=appointments/edit&id=<?= (int) $appointment['id'] ?>"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            <i class="ti ti-edit me-1"></i>
+                                            تعديل
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            <?php endforeach; ?>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
 
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>

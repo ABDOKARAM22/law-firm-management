@@ -12,160 +12,122 @@ $statusLabels = [
     'cancelled' => 'ملغي',
 ];
 
+$pageTitle = 'إضافة موعد';
+
+require __DIR__ . '/../layouts/header.php';
+
 ?>
 
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<div class="container-xl">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-4">
 
-    <title>إضافة موعد</title>
+        <div class="row align-items-center">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+            <div class="col">
 
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #f5f7fa;
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
+                <div class="page-pretitle">
+                    المواعيد
+                </div>
 
-        .container {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+                <h2 class="page-title">
+                    إضافة موعد جديد
+                </h2>
 
-        h1 {
-            margin-top: 0;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #1f2937;
-            font-size: 28px;
-        }
+            </div>
 
-        .errors {
-            background-color: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #b91c1c;
-            padding: 15px 20px;
-            border-radius: 7px;
-            margin-bottom: 25px;
-        }
+            <div class="col-auto">
 
-        .errors ul {
-            margin: 0;
-            padding-right: 20px;
-        }
+                <a
+                    href="?route=appointments"
+                    class="btn btn-outline-secondary"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                    >
+                        <path d="M15 6l-6 6l6 6"></path>
+                    </svg>
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+                    العودة للمواعيد
+                </a>
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #374151;
-        }
+            </div>
 
-        input,
-        select,
-        textarea {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 15px;
-            font-family: inherit;
-            background-color: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
+        </div>
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .field-error {
-            margin-top: 6px;
-            color: #dc2626;
-            font-size: 14px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .submit-btn {
-            width: 100%;
-            margin-top: 10px;
-            padding: 13px;
-            border: none;
-            border-radius: 6px;
-            background-color: #2563eb;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .submit-btn:hover {
-            background-color: #1d4ed8;
-        }
-
-        .assigned-user {
-            background-color: #f9fafb;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 20px 10px;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-        }
-    </style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-    <h1>إضافة موعد</h1>
+    </div>
 
 
+    <!-- Validation Errors -->
+    <?php if (!empty($errors)): ?>
 
-    <form method="POST" action="?route=appointments/create">
+        <div
+            class="alert alert-danger mb-4"
+            role="alert"
+        >
+
+            <div class="d-flex">
+
+                <div>
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon alert-icon"
+                    >
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="9"
+                        ></circle>
+
+                        <path d="M12 8v4"></path>
+
+                        <path d="M12 16h.01"></path>
+                    </svg>
+
+                </div>
+
+                <div>
+
+                    <h4 class="alert-title">
+                        يرجى مراجعة البيانات
+                    </h4>
+
+                    <div>
+                        توجد بعض الأخطاء في البيانات المدخلة.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <form
+        method="POST"
+        action="?route=appointments/create"
+    >
 
         <input
             type="hidden"
@@ -174,295 +136,412 @@ $statusLabels = [
         >
 
 
-        <div class="form-group">
+        <!-- Appointment Information -->
+        <div class="card mb-4">
 
-            <label for="client_id">
-                العميل
-            </label>
+            <div class="card-header">
 
-            <select
-                name="client_id"
-                id="client_id"
-            >
+                <h3 class="card-title">
+                    بيانات الموعد
+                </h3>
 
-                <option value="">
-                    بدون عميل
-                </option>
+            </div>
 
-                <?php foreach ($clients as $client): ?>
+            <div class="card-body">
 
-                    <option
-                        value="<?= (int) $client['id'] ?>"
-                        <?= (
-                            (string) ($old['client_id'] ?? '') ===
-                            (string) $client['id']
-                        ) ? 'selected' : '' ?>
+                <!-- Client -->
+                <div class="mb-3">
+
+                    <label
+                        for="client_id"
+                        class="form-label"
                     >
-                        <?= htmlspecialchars($client['name']) ?>
-                    </option>
+                        العميل
+                    </label>
 
-                <?php endforeach; ?>
+                    <select
+                        name="client_id"
+                        id="client_id"
+                        class="form-select <?= isset($errors['client_id']) ? 'is-invalid' : '' ?>"
+                    >
 
-            </select>
-
-            <?php if (isset($errors['client_id'])): ?>
-
-                <div class="field-error">
-                    <?= htmlspecialchars($errors['client_id']) ?>
-                </div>
-
-            <?php endif; ?>
-
-        </div>
-
-
-        <?php if ($role !== 'lawyer'): ?>
-
-            <div class="form-group">
-
-                <label for="assigned_user_id">
-                    المسؤول عن الموعد
-                </label>
-
-                <select
-                    name="assigned_user_id"
-                    id="assigned_user_id"
-                >
-
-                    <option value="">
-                        اختر المسؤول
-                    </option>
-
-                    <?php foreach ($users as $user): ?>
-
-                        <option
-                            value="<?= (int) $user['id'] ?>"
-                            <?= (
-                                (string) ($old['assigned_user_id'] ?? '') ===
-                                (string) $user['id']
-                            ) ? 'selected' : '' ?>
-                        >
-                            <?= htmlspecialchars($user['name']) ?>
-
-                            -
-                            
-                            <?= $user['role'] === 'lawyer'
-                                ? 'محامي'
-                                : 'موظف' ?>
+                        <option value="">
+                            بدون عميل
                         </option>
 
-                    <?php endforeach; ?>
+                        <?php foreach ($clients as $client): ?>
 
-                </select>
+                            <option
+                                value="<?= (int) $client['id'] ?>"
+                                <?= (
+                                    (string) ($old['client_id'] ?? '') ===
+                                    (string) $client['id']
+                                ) ? 'selected' : '' ?>
+                            >
+                                <?= htmlspecialchars($client['name']) ?>
+                            </option>
 
-                <?php if (isset($errors['assigned_user_id'])): ?>
+                        <?php endforeach; ?>
 
-                    <div class="field-error">
-                        <?= htmlspecialchars($errors['assigned_user_id']) ?>
-                    </div>
+                    </select>
 
-                <?php endif; ?>
+                    <?php if (isset($errors['client_id'])): ?>
 
-            </div>
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['client_id']) ?>
+                        </div>
 
-        <?php else: ?>
+                    <?php endif; ?>
 
-            <div class="form-group">
-
-                <label for="assigned_user">
-                    المسؤول عن الموعد
-                </label>
-
-                <input
-                    type="text"
-                    id="assigned_user"
-                    class="assigned-user"
-                    value="أنت المسؤول عن هذا الموعد"
-                    disabled
-                >
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <div class="form-row">
-
-            <div class="form-group">
-
-                <label for="appointment_date">
-                    التاريخ
-                </label>
-
-                <input
-                    type="date"
-                    name="appointment_date"
-                    id="appointment_date"
-                    value="<?= htmlspecialchars(
-                        $old['appointment_date'] ?? ''
-                    ) ?>"
-                >
-
-                <?php if (isset($errors['appointment_date'])): ?>
-
-                    <div class="field-error">
-                        <?= htmlspecialchars($errors['appointment_date']) ?>
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="appointment_time">
-                    الوقت
-                </label>
-
-                <input
-                    type="time"
-                    name="appointment_time"
-                    id="appointment_time"
-                    value="<?= htmlspecialchars(
-                        $old['appointment_time'] ?? ''
-                    ) ?>"
-                >
-
-                <?php if (isset($errors['appointment_time'])): ?>
-
-                    <div class="field-error">
-                        <?= htmlspecialchars($errors['appointment_time']) ?>
-                    </div>
-
-                <?php endif; ?>
-
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="title">
-                عنوان الموعد
-            </label>
-
-            <input
-                type="text"
-                name="title"
-                id="title"
-                value="<?= htmlspecialchars($old['title'] ?? '') ?>"
-                placeholder="مثال: مقابلة مع العميل"
-            >
-
-            <?php if (isset($errors['title'])): ?>
-
-                <div class="field-error">
-                    <?= htmlspecialchars($errors['title']) ?>
                 </div>
 
-            <?php endif; ?>
 
-        </div>
+                <!-- Assigned User -->
+                <?php if ($role !== 'lawyer'): ?>
+
+                    <div class="mb-3">
+
+                        <label
+                            for="assigned_user_id"
+                            class="form-label"
+                        >
+                            المسؤول عن الموعد
+                        </label>
+
+                        <select
+                            name="assigned_user_id"
+                            id="assigned_user_id"
+                            class="form-select <?= isset($errors['assigned_user_id']) ? 'is-invalid' : '' ?>"
+                        >
+
+                            <option value="">
+                                اختر المسؤول
+                            </option>
+
+                            <?php foreach ($users as $user): ?>
+
+                                <option
+                                    value="<?= (int) $user['id'] ?>"
+                                    <?= (
+                                        (string) ($old['assigned_user_id'] ?? '') ===
+                                        (string) $user['id']
+                                    ) ? 'selected' : '' ?>
+                                >
+                                    <?= htmlspecialchars($user['name']) ?>
+                                    -
+                                    <?= $user['role'] === 'lawyer'
+                                        ? 'محامي'
+                                        : 'موظف' ?>
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                        <?php if (isset($errors['assigned_user_id'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['assigned_user_id']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+                <?php else: ?>
+
+                    <div class="mb-3">
+
+                        <label
+                            for="assigned_user"
+                            class="form-label"
+                        >
+                            المسؤول عن الموعد
+                        </label>
+
+                        <input
+                            type="text"
+                            id="assigned_user"
+                            class="form-control"
+                            value="أنت المسؤول عن هذا الموعد"
+                            disabled
+                        >
+
+                        <div class="form-hint">
+                            سيتم تسجيل الموعد باسمك تلقائيًا.
+                        </div>
+
+                    </div>
+
+                <?php endif; ?>
 
 
-        <div class="form-group">
+                <!-- Date & Time -->
+                <div class="row">
 
-            <label for="type">
-                نوع الموعد
-            </label>
+                    <div class="col-md-6 mb-3">
 
-            <input
-                type="text"
-                name="type"
-                id="type"
-                value="<?= htmlspecialchars($old['type'] ?? '') ?>"
-                placeholder="مثال: مقابلة - استشارة - متابعة"
-            >
+                        <label
+                            for="appointment_date"
+                            class="form-label"
+                        >
+                            التاريخ
+                        </label>
 
-            <?php if (isset($errors['type'])): ?>
+                        <input
+                            type="date"
+                            name="appointment_date"
+                            id="appointment_date"
+                            class="form-control <?= isset($errors['appointment_date']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars(
+                                $old['appointment_date'] ?? ''
+                            ) ?>"
+                        >
 
-                <div class="field-error">
-                    <?= htmlspecialchars($errors['type']) ?>
+                        <?php if (isset($errors['appointment_date'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['appointment_date']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
+
+                    <div class="col-md-6 mb-3">
+
+                        <label
+                            for="appointment_time"
+                            class="form-label"
+                        >
+                            الوقت
+                        </label>
+
+                        <input
+                            type="time"
+                            name="appointment_time"
+                            id="appointment_time"
+                            class="form-control <?= isset($errors['appointment_time']) ? 'is-invalid' : '' ?>"
+                            value="<?= htmlspecialchars(
+                                $old['appointment_time'] ?? ''
+                            ) ?>"
+                        >
+
+                        <?php if (isset($errors['appointment_time'])): ?>
+
+                            <div class="invalid-feedback">
+                                <?= htmlspecialchars($errors['appointment_time']) ?>
+                            </div>
+
+                        <?php endif; ?>
+
+                    </div>
+
                 </div>
 
-            <?php endif; ?>
+            </div>
 
         </div>
 
 
-        <div class="form-group">
+        <!-- Appointment Details -->
+        <div class="card mb-4">
 
-            <label for="status">
-                الحالة
-            </label>
+            <div class="card-header">
 
-            <select
-                name="status"
-                id="status"
-            >
+                <h3 class="card-title">
+                    تفاصيل الموعد
+                </h3>
 
-                <?php foreach ($statusLabels as $status => $label): ?>
+            </div>
 
-                    <option
-                        value="<?= $status ?>"
-                        <?= (
-                            ($old['status'] ?? 'scheduled') === $status
-                        ) ? 'selected' : '' ?>
+            <div class="card-body">
+
+                <!-- Title -->
+                <div class="mb-3">
+
+                    <label
+                        for="title"
+                        class="form-label"
                     >
-                        <?= $label ?>
-                    </option>
+                        عنوان الموعد
+                    </label>
 
-                <?php endforeach; ?>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        class="form-control <?= isset($errors['title']) ? 'is-invalid' : '' ?>"
+                        value="<?= htmlspecialchars(
+                            $old['title'] ?? ''
+                        ) ?>"
+                        placeholder="مثال: مقابلة مع العميل"
+                    >
 
-            </select>
+                    <?php if (isset($errors['title'])): ?>
 
-            <?php if (isset($errors['status'])): ?>
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['title']) ?>
+                        </div>
 
-                <div class="field-error">
-                    <?= htmlspecialchars($errors['status']) ?>
+                    <?php endif; ?>
+
                 </div>
 
-            <?php endif; ?>
+
+                <!-- Type -->
+                <div class="mb-3">
+
+                    <label
+                        for="type"
+                        class="form-label"
+                    >
+                        نوع الموعد
+                    </label>
+
+                    <input
+                        type="text"
+                        name="type"
+                        id="type"
+                        class="form-control <?= isset($errors['type']) ? 'is-invalid' : '' ?>"
+                        value="<?= htmlspecialchars(
+                            $old['type'] ?? ''
+                        ) ?>"
+                        placeholder="مثال: مقابلة - استشارة - متابعة"
+                    >
+
+                    <?php if (isset($errors['type'])): ?>
+
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['type']) ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                </div>
+
+
+                <!-- Status -->
+                <div class="mb-3">
+
+                    <label
+                        for="status"
+                        class="form-label"
+                    >
+                        الحالة
+                    </label>
+
+                    <select
+                        name="status"
+                        id="status"
+                        class="form-select <?= isset($errors['status']) ? 'is-invalid' : '' ?>"
+                    >
+
+                        <?php foreach ($statusLabels as $status => $label): ?>
+
+                            <option
+                                value="<?= htmlspecialchars($status) ?>"
+                                <?= (
+                                    ($old['status'] ?? 'scheduled') === $status
+                                ) ? 'selected' : '' ?>
+                            >
+                                <?= htmlspecialchars($label) ?>
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                    <?php if (isset($errors['status'])): ?>
+
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['status']) ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                </div>
+
+
+                <!-- Notes -->
+                <div class="mb-0">
+
+                    <label
+                        for="notes"
+                        class="form-label"
+                    >
+                        ملاحظات
+                    </label>
+
+                    <textarea
+                        name="notes"
+                        id="notes"
+                        class="form-control"
+                        rows="5"
+                        placeholder="أضف أي ملاحظات خاصة بالموعد..."
+                    ><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
+
+                    <?php if (isset($errors['notes'])): ?>
+
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['notes']) ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                </div>
+
+            </div>
 
         </div>
 
 
-        <div class="form-group">
+        <!-- Actions -->
+        <div class="card">
 
-            <label for="notes">
-                ملاحظات
-            </label>
+            <div class="card-body">
 
-            <textarea
-                name="notes"
-                id="notes"
-                rows="5"
-                placeholder="أضف أي ملاحظات خاصة بالموعد..."
-            ><?= htmlspecialchars($old['notes'] ?? '') ?></textarea>
+                <div class="d-flex flex-wrap gap-2">
 
-            <?php if (isset($errors['notes'])): ?>
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon"
+                        >
+                            <path d="M12 5v14"></path>
+                            <path d="M5 12h14"></path>
+                        </svg>
 
-                <div class="field-error">
-                    <?= htmlspecialchars($errors['notes']) ?>
+                        حفظ الموعد
+                    </button>
+
+                    <a
+                        href="?route=appointments"
+                        class="btn btn-outline-secondary"
+                    >
+                        إلغاء
+                    </a>
+
                 </div>
 
-            <?php endif; ?>
+            </div>
 
         </div>
-
-
-        <button
-            type="submit"
-            class="submit-btn"
-        >
-            حفظ الموعد
-        </button>
 
     </form>
 
 </div>
 
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/footer.php'; ?>
