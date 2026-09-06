@@ -3,370 +3,329 @@
 use LawFirmManagement\Core\Csrf;
 use LawFirmManagement\Core\Flash;
 
-$errors = Flash::get('errors') ?? [];
 $success = Flash::get('success');
+
+$pageTitle = 'مستندات القضية';
+
+require __DIR__ . '/../layouts/header.php';
 
 ?>
 
-<!DOCTYPE html>
+<div class="container-xl">
 
-<html lang="ar" dir="rtl">
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-3">
 
-<head>
+        <div class="row align-items-center">
 
-    <meta charset="UTF-8">
+            <div class="col">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <div class="page-pretitle">
+                    إدارة مستندات القضية
+                </div>
 
-    <title>مستندات القضية</title>
+                <h2 class="page-title">
+                    مستندات القضية
+                </h2>
 
-    <style>
+            </div>
 
-        * {
-            box-sizing: border-box;
-        }
+            <div class="col-auto ms-auto">
 
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            background: #f5f6fa;
-            font-family: Arial, sans-serif;
-            color: #2c3e50;
-        }
+                <div class="btn-list">
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+                    <a
+                        href="?route=documents/create&case_id=<?= (int) $caseId ?>"
+                        class="btn btn-primary"
+                    >
+                        <i class="ti ti-file-plus me-1"></i>
+                        إضافة مستند
+                    </a>
 
-        h1 {
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-align: center;
-            color: #1f3c5b;
-            font-size: 28px;
-        }
+                    <a
+                        href="?route=cases/show&id=<?= (int) $caseId ?>"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="ti ti-arrow-right me-1"></i>
+                        العودة إلى القضية
+                    </a>
 
-        .success-message {
-            margin-bottom: 20px;
-            padding: 12px 15px;
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-            border-radius: 6px;
-            text-align: center;
-        }
+                </div>
 
-        .top-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 10px;
-        }
+            </div>
 
-        .add-link {
-            display: inline-block;
-            padding: 10px 18px;
-            background: #1f6f8b;
-            color: #ffffff;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-
-        .add-link:hover {
-            background: #15566d;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
-
-        th {
-            background: #1f3c5b;
-            color: #ffffff;
-            padding: 13px 12px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e1e5e9;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        tbody tr:hover {
-            background: #f8fafc;
-        }
-
-        .actions {
-            white-space: nowrap;
-        }
-
-        .actions a {
-            display: inline-block;
-            margin: 2px;
-            padding: 7px 10px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .download-link {
-            background: #1f6f8b;
-            color: #ffffff;
-        }
-
-        .download-link:hover {
-            background: #15566d;
-        }
-
-        .edit-link {
-            background: #d68910;
-            color: #ffffff;
-        }
-
-        .edit-link:hover {
-            background: #b9770e;
-        }
-
-        .delete-form {
-            display: inline;
-        }
-
-        .delete-button {
-            border: none;
-            padding: 7px 10px;
-            border-radius: 5px;
-            background: #c0392b;
-            color: #ffffff;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .delete-button:hover {
-            background: #962d22;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            color: #666;
-        }
-
-        .bottom-actions {
-            display: flex;
-            justify-content: flex-start;
-            margin-top: 25px;
-        }
-
-        .back-link {
-            display: inline-block;
-            padding: 10px 18px;
-            background: #1f3c5b;
-            color: #ffffff;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            background: #162d43;
-        }
-
-        @media (max-width: 600px) {
-
-            body {
-                padding: 20px 10px;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            .top-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .add-link {
-                text-align: center;
-            }
-
-            .bottom-actions {
-                justify-content: stretch;
-            }
-
-            .back-link {
-                width: 100%;
-                text-align: center;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-    <h1>مستندات القضية</h1>
-
-    <?php if ($success): ?>
-
-        <div class="success-message">
-            <?= htmlspecialchars($success) ?>
         </div>
-
-    <?php endif; ?>
-
-    <div class="top-actions">
-
-        <a
-            class="add-link"
-            href="?route=documents/create&case_id=<?= (int) $caseId ?>"
-        >
-            + إضافة مستند
-        </a>
 
     </div>
 
-    <?php if (!empty($documents)): ?>
+    <!-- Success Message -->
+    <?php if ($success): ?>
 
-        <div class="table-wrapper">
+        <div
+            class="alert alert-success alert-dismissible"
+            role="alert"
+        >
 
-            <table>
+            <div class="d-flex">
 
-                <thead>
+                <div>
+                    <i class="ti ti-check"></i>
+                </div>
 
-                    <tr>
-                        <th>العنوان</th>
-                        <th>اسم الملف</th>
-                        <th>نوع الملف</th>
-                        <th>حجم الملف</th>
-                        <th>تم الرفع بواسطة</th>
-                        <th>التاريخ</th>
-                        <th>الإجراءات</th>
-                    </tr>
+                <div>
+                    <?= htmlspecialchars($success) ?>
+                </div>
 
-                </thead>
+            </div>
 
-                <tbody>
-
-                <?php foreach ($documents as $document): ?>
-
-                    <tr>
-
-                        <td>
-                            <?= htmlspecialchars($document['title']) ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars($document['file_name']) ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars($document['file_type']) ?>
-                        </td>
-
-                        <td>
-                            <?= number_format($document['file_size'] / 1024, 2) ?>
-                            KB
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars($document['uploaded_by_name']) ?>
-                        </td>
-
-                        <td>
-                            <?= htmlspecialchars($document['created_at']) ?>
-                        </td>
-
-                        <td class="actions">
-
-                            <a
-                                class="download-link"
-                                href="?route=documents/download&id=<?= (int) $document['id'] ?>"
-                            >
-                                تحميل
-                            </a>
-
-                            <a
-                                class="edit-link"
-                                href="?route=documents/edit&id=<?= (int) $document['id'] ?>"
-                            >
-                                تعديل
-                            </a>
-
-                            <form
-                                class="delete-form"
-                                method="POST"
-                                action="?route=documents/delete&id=<?= (int) $document['id'] ?>"
-                            >
-
-                                <input
-                                    type="hidden"
-                                    name="_token"
-                                    value="<?= htmlspecialchars(Csrf::token()) ?>"
-                                >
-
-                                <button
-                                    class="delete-button"
-                                    type="submit"
-                                >
-                                    حذف
-                                </button>
-
-                            </form>
-
-                        </td>
-
-                    </tr>
-
-                <?php endforeach; ?>
-
-                </tbody>
-
-            </table>
+            <a
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="إغلاق"
+            ></a>
 
         </div>
 
-    <?php else: ?>
-
-        <p class="empty-message">
-            لا توجد مستندات لهذه القضية.
-        </p>
-
     <?php endif; ?>
 
-    <div class="bottom-actions">
+    <!-- Documents Card -->
+    <div class="card">
 
-        <a
-            class="back-link"
-            href="?route=cases/show&id=<?= (int) $caseId ?>"
-        >
-            العودة إلى القضية
-        </a>
+        <div class="card-header">
+
+            <h3 class="card-title">
+                قائمة المستندات
+            </h3>
+
+        </div>
+
+        <?php if (!empty($documents)): ?>
+
+            <div class="table-responsive">
+
+                <table class="table table-vcenter card-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>العنوان</th>
+
+                            <th>اسم الملف</th>
+
+                            <th>نوع الملف</th>
+
+                            <th>الحجم</th>
+
+                            <th>تم الرفع بواسطة</th>
+
+                            <th>تاريخ الرفع</th>
+
+                            <th class="w-1">
+                                الإجراءات
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <?php foreach ($documents as $document): ?>
+
+                        <tr>
+
+                            <td>
+
+                                <div class="fw-bold">
+                                    <?= htmlspecialchars($document['title']) ?>
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <div class="text-secondary">
+
+                                    <i class="ti ti-file me-1"></i>
+
+                                    <?= htmlspecialchars($document['file_name']) ?>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-secondary-lt">
+
+                                    <?= htmlspecialchars($document['file_type']) ?>
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <?= number_format(
+                                    $document['file_size'] / 1024,
+                                    2
+                                ) ?>
+
+                                KB
+
+                            </td>
+
+                            <td>
+
+                                <div class="d-flex align-items-center">
+
+                                    <i class="ti ti-user me-1 text-secondary"></i>
+
+                                    <?= htmlspecialchars(
+                                        $document['uploaded_by_name']
+                                    ) ?>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                <span class="text-secondary">
+
+                                    <?= htmlspecialchars(
+                                        $document['created_at']
+                                    ) ?>
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <div class="btn-list flex-nowrap">
+
+                                    <a
+                                        href="?route=documents/download&id=<?= (int) $document['id'] ?>"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="تحميل المستند"
+                                    >
+
+                                        <i class="ti ti-download"></i>
+
+                                        <span class="d-none d-md-inline">
+                                            تحميل
+                                        </span>
+
+                                    </a>
+
+                                    <a
+                                        href="?route=documents/edit&id=<?= (int) $document['id'] ?>"
+                                        class="btn btn-sm btn-outline-warning"
+                                        title="تعديل المستند"
+                                    >
+
+                                        <i class="ti ti-edit"></i>
+
+                                        <span class="d-none d-md-inline">
+                                            تعديل
+                                        </span>
+
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="?route=documents/delete&id=<?= (int) $document['id'] ?>"
+                                        class="d-inline"
+                                        onsubmit="return confirm('هل أنت متأكد من حذف هذا المستند؟');"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="_token"
+                                            value="<?= htmlspecialchars(
+                                                Csrf::token()
+                                            ) ?>"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            title="حذف المستند"
+                                        >
+
+                                            <i class="ti ti-trash"></i>
+
+                                            <span class="d-none d-md-inline">
+                                                حذف
+                                            </span>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <?php else: ?>
+
+            <!-- Empty State -->
+            <div class="card-body">
+
+                <div class="empty">
+
+                    <div class="empty-img">
+                        <i
+                            class="ti ti-file-off"
+                            style="font-size: 4rem;"
+                        ></i>
+                    </div>
+
+                    <p class="empty-title">
+                        لا توجد مستندات
+                    </p>
+
+                    <p class="empty-subtitle text-secondary">
+                        لم تتم إضافة أي مستندات إلى هذه القضية حتى الآن.
+                    </p>
+
+                    <div class="empty-action">
+
+                        <a
+                            href="?route=documents/create&case_id=<?= (int) $caseId ?>"
+                            class="btn btn-primary"
+                        >
+
+                            <i class="ti ti-file-plus me-1"></i>
+
+                            إضافة أول مستند
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <?php endif; ?>
 
     </div>
 
 </div>
 
-</body>
+<?php
 
-</html>
+require __DIR__ . '/../layouts/footer.php';

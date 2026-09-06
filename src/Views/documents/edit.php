@@ -6,237 +6,310 @@ use LawFirmManagement\Core\Flash;
 $errors = Flash::get('errors') ?? [];
 $old = Flash::get('old') ?? [];
 
+$pageTitle = 'تعديل المستند';
+
+require __DIR__ . '/../layouts/header.php';
+
 ?>
 
-<!DOCTYPE html>
+<div class="container-xl">
 
-<html lang="ar" dir="rtl">
+    <!-- Page Header -->
+    <div class="page-header d-print-none mb-3">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <div class="row align-items-center">
 
-    <title>تعديل مستند</title>
+            <div class="col">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+                <div class="page-pretitle">
+                    مستندات القضية
+                </div>
 
-        body {
-            margin: 0;
-            padding: 40px 20px;
-            background: #f5f6fa;
-            font-family: Arial, sans-serif;
-            color: #2c3e50;
-        }
+                <h2 class="page-title">
+                    تعديل المستند
+                </h2>
 
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
+            </div>
 
-        h1 {
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-align: center;
-            color: #1f3c5b;
-            font-size: 28px;
-        }
+            <div class="col-auto ms-auto">
 
-        .case-info {
-            background: #f0f4f8;
-            padding: 15px 18px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            line-height: 1.8;
-        }
+                <a
+                    href="?route=cases/documents&id=<?= (int) $document['case_id'] ?>"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="ti ti-arrow-right me-1"></i>
+                    العودة إلى المستندات
+                </a>
 
-        .file-info {
-            background: #fafafa;
-            border: 1px solid #e1e5e9;
-            padding: 18px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-
-        .file-info p {
-            margin: 8px 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="file"] {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #ccd3da;
-            border-radius: 6px;
-            font-size: 15px;
-            background: #fff;
-        }
-
-        input[type="text"]:focus,
-        input[type="file"]:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
-        }
-
-        .error {
-            margin-top: 7px;
-            color: #c0392b;
-            font-size: 14px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            background: #1f6f8b;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: #15566d;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 20px;
-            text-align: center;
-            color: #1f6f8b;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <h1>تعديل مستند</h1>
-
-    <div class="case-info">
-        القضية:
-        <?= htmlspecialchars($document['case_number']) ?>
-        -
-        <?= htmlspecialchars($document['case_title']) ?>
-    </div>
-
-    <div class="file-info">
-
-        <p>
-            <strong>الملف الحالي:</strong>
-            <?= htmlspecialchars($document['file_name']) ?>
-        </p>
-
-        <p>
-            <strong>نوع الملف:</strong>
-            <?= htmlspecialchars($document['file_type']) ?>
-        </p>
-
-        <p>
-            <strong>حجم الملف:</strong>
-            <?= round($document['file_size'] / 1024, 2) ?> KB
-        </p>
-
-    </div>
-
-    <form
-        method="POST"
-        action="?route=documents/edit&id=<?= (int) $document['id'] ?>"
-        enctype="multipart/form-data"
-    >
-
-        <input
-            type="hidden"
-            name="_token"
-            value="<?= htmlspecialchars(Csrf::token()) ?>"
-        >
-
-        <div class="form-group">
-
-            <label for="title">
-                عنوان المستند
-            </label>
-
-            <input
-                type="text"
-                id="title"
-                name="title"
-                value="<?= htmlspecialchars(
-                    $old['title'] ?? $document['title']
-                ) ?>"
-            >
-
-            <?php if (isset($errors['title'])): ?>
-
-                <p class="error">
-                    <?= htmlspecialchars($errors['title']) ?>
-                </p>
-
-            <?php endif; ?>
+            </div>
 
         </div>
 
-        <div class="form-group">
+    </div>
 
-            <label for="file">
-                استبدال الملف (اختياري)
-            </label>
+    <!-- Case Information -->
+    <div class="card mb-3">
 
-            <input
-                type="file"
-                id="file"
-                name="file"
-            >
+        <div class="card-header">
 
-            <?php if (isset($errors['file'])): ?>
-
-                <p class="error">
-                    <?= htmlspecialchars($errors['file']) ?>
-                </p>
-
-            <?php endif; ?>
+            <h3 class="card-title">
+                <i class="ti ti-briefcase me-1"></i>
+                بيانات القضية
+            </h3>
 
         </div>
 
-        <button type="submit">
-            حفظ التعديلات
-        </button>
+        <div class="card-body">
 
-    </form>
+            <div class="row">
 
-    <a
-        class="back-link"
-        href="?route=cases/documents&id=<?= (int) $document['case_id'] ?>"
-    >
-        العودة إلى مستندات القضية
-    </a>
+                <div class="col-md-4 mb-3 mb-md-0">
+
+                    <div class="text-secondary">
+                        رقم القضية
+                    </div>
+
+                    <div class="fw-bold">
+                        <?= htmlspecialchars($document['case_number']) ?>
+                    </div>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="text-secondary">
+                        عنوان القضية
+                    </div>
+
+                    <div class="fw-bold">
+                        <?= htmlspecialchars($document['case_title']) ?>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Current File -->
+    <div class="card mb-3">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                <i class="ti ti-file me-1"></i>
+                المستند الحالي
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3 mb-md-0">
+
+                    <div class="text-secondary">
+                        اسم الملف
+                    </div>
+
+                    <div class="fw-bold">
+                        <?= htmlspecialchars($document['file_name']) ?>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 mb-3 mb-md-0">
+
+                    <div class="text-secondary">
+                        نوع الملف
+                    </div>
+
+                    <div>
+                        <span class="badge bg-secondary-lt">
+                            <?= htmlspecialchars($document['file_type']) ?>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="text-secondary">
+                        الحجم
+                    </div>
+
+                    <div class="fw-bold">
+                        <?= number_format($document['file_size'] / 1024, 2) ?> KB
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Edit Form -->
+    <div class="card">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                بيانات المستند
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <?php if (!empty($errors)): ?>
+
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                >
+
+                    <div class="d-flex">
+
+                        <div>
+                            <i class="ti ti-alert-circle me-2"></i>
+                        </div>
+
+                        <div>
+
+                            <h4 class="alert-title">
+                                يرجى تصحيح الأخطاء التالية
+                            </h4>
+
+                            <div class="text-secondary">
+
+                                <ul class="mb-0">
+
+                                    <?php foreach ($errors as $error): ?>
+
+                                        <li>
+                                            <?= htmlspecialchars($error) ?>
+                                        </li>
+
+                                    <?php endforeach; ?>
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <?php endif; ?>
+
+            <form
+                method="POST"
+                action="?route=documents/edit&id=<?= (int) $document['id'] ?>"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="hidden"
+                    name="_token"
+                    value="<?= htmlspecialchars(Csrf::token()) ?>"
+                >
+
+                <div class="mb-3">
+
+                    <label
+                        for="title"
+                        class="form-label"
+                    >
+                        عنوان المستند
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        class="form-control <?= isset($errors['title']) ? 'is-invalid' : '' ?>"
+                        value="<?= htmlspecialchars($old['title'] ?? $document['title']) ?>"
+                        required
+                    >
+
+                    <?php if (isset($errors['title'])): ?>
+
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['title']) ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label
+                        for="file"
+                        class="form-label"
+                    >
+                        استبدال الملف
+                    </label>
+
+                    <input
+                        type="file"
+                        id="file"
+                        name="file"
+                        class="form-control <?= isset($errors['file']) ? 'is-invalid' : '' ?>"
+                    >
+
+                    <?php if (isset($errors['file'])): ?>
+
+                        <div class="invalid-feedback">
+                            <?= htmlspecialchars($errors['file']) ?>
+                        </div>
+
+                    <?php endif; ?>
+
+                    <div class="form-hint">
+                        اترك الحقل فارغًا للاحتفاظ بالملف الحالي.
+                        الملفات المسموح بها: PDF, JPG, PNG, DOC, DOCX — الحد الأقصى 5 MB.
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                        href="?route=cases/documents&id=<?= (int) $document['case_id'] ?>"
+                        class="btn btn-outline-secondary"
+                    >
+                        إلغاء
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="ti ti-device-floppy me-1"></i>
+
+                        حفظ التعديلات
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 
-</body>
+<?php
 
-</html>
+require __DIR__ . '/../layouts/footer.php';
